@@ -41,4 +41,10 @@ cd spring-boot-backend/uscstudyspotfinder
 ```
 Go to `http://localhost:8080` to see Spring backend welcome page.
 
+## Miscellaneous
+For future reference, here's what the backend is configured with:
+
+![image](https://github.com/user-attachments/assets/3d596e2a-11e0-48a0-b7f5-23538e5bf6e2)
+
+
 
