@@ -14,7 +14,7 @@ cd react-frontend
 npm install
 ```
 
-Install backend dependencies (install npm if you don't have it):
+Install backend dependencies:
 ```
 cd spring-boot-backend/uscstudyspotfinder
 ./mvnw clean install
