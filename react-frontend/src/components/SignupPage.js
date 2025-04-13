@@ -21,14 +21,13 @@ const SignupPage = () => {
   // Handle form submission
   const handleSignup = (e) => {
     e.preventDefault();
-    
+
     // Check if passwords match
     if (newUser.password !== newUser.confirmPassword) {
       alert("Passwords don't match!");
       return;
     }
     
-    // Here you would add your registration logic
     console.log('New user data:', newUser);
     // Add API call for registration later
   };

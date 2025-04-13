@@ -9,12 +9,12 @@ function App() {
       <Routes>
         {/* Redirect root path to login page */}
         <Route path="/" element={<LoginPage />} />
-        
-        {/* Keep login and signup routes */}
+
+        {/* Keep login and signup routes*/}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
-        
-        {/* Catch any other routes and redirect to login */}
+
+        {/* Catch any other routes and redirect to login for now*/}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

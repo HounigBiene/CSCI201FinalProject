@@ -19,8 +19,8 @@ const LoginPage = () => {
 
   // Handle form submission
   const handleSubmit = (e) => {
+    // Must enter some values
     e.preventDefault();
-    // Here you would add your authentication logic
     console.log('Login credentials:', credentials);
     // Add API call for authentication later
   };
