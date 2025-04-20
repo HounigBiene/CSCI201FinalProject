@@ -13,7 +13,6 @@ public class StudySpot {
     private String location;
     private String description;
 
-    // Constructors
     public StudySpot() {}
 
     public StudySpot(String name, String location, String description) {
@@ -22,7 +21,6 @@ public class StudySpot {
         this.description = description;
     }
 
-    // Getters and Setters
     public Long getId() {
         return id;
     }
