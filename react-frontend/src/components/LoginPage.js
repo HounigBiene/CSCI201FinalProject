@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
   // State for storing form values
@@ -25,7 +25,7 @@ const LoginPage = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     // Must enter some values
     e.preventDefault();
     console.log('Login credentials:', credentials);
@@ -110,13 +110,13 @@ const LoginPage = () => {
       {error && <div style={{color: 'red', marginBottom: '10px'}}>{error}</div>}
       <form style={styles.form} onSubmit={handleSubmit}>
         <div style={styles.inputGroup}>
-          <label htmlFor="userId">Username</label>
+          <label htmlFor="username">Username</label>
           <input
             type="text"
-            id="userId"
-            name="userId"
+            id="username"
+            name="username"
             style={styles.input}
-            value={credentials.userId}
+            value={credentials.username}
             onChange={handleChange}
             required
           />

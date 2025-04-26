@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 const SignupPage = () => {
   // State for storing form values
   const [newUser, setNewUser] = useState({
     username: '',
+    email: '',
     password: '',
     confirmPassword: ''
   });
+
+  const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handle form input changes
   const handleChange = (e) => {
@@ -19,7 +24,7 @@ const SignupPage = () => {
   };
 
   // Handle form submission
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
 
     // Check if passwords match
@@ -176,7 +181,7 @@ const SignupPage = () => {
     </form>
     <Link to="/login" style={styles.link}>Already have an account? Login</Link>
   </div>
-);
-
+  );
+};
 
 export default SignupPage;
