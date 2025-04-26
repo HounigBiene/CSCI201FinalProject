@@ -1,6 +1,13 @@
 create SCHEMA IF NOT EXISTS studyspot_finder;
 USE studyspot_finder;
 
+DROP TABLE friends_list;
+DROP TABLE check_in;
+DROP TABLE fave_spot;
+DROP TABLE votes;
+DROP TABLE study_spot;
+DROP TABLE user;
+
 CREATE TABLE `user`(
     `user_id` INT AUTO_INCREMENT PRIMARY KEY,
     `username` VARCHAR(30) NOT NULL,
@@ -68,62 +75,55 @@ VALUES (
   'Outdoor seating area surrounded by engineering buildings. Great for group work and fresh air.',
   ST_GeomFromText('POINT(-118.2895 34.0209)')
 );
-
-INSERT INTO `votes` (`user_id`, `location_id`) VALUES (1, 1);
-
-INSERT INTO `fave_spot` (`user_id`, `location_id`) VALUES (1, 1);
-
-INSERT INTO `check_in` (`user_id`, `location_id`, `check_in_time`)
-VALUES (1, 1, NOW());
-
-INSERT INTO `friends_list` (`user_id_1`, `user_id_2`, `status`) VALUES (1, 2, 'accepted');
-
--- SOME USEFUL SCRIPTS
--- get all study spots
-SELECT location_id, name, description FROM study_spot;
-
--- get user and password
-SELECT username, password FROM user;
-
--- get a user's favorite spots
-SELECT ss.location_id, ss.name, ss.description
-FROM fave_spot fs
-JOIN study_spot ss ON fs.location_id = ss.location_id
-WHERE fs.user_id = 1;
-
--- get votes on spots
-SELECT ss.location_id, ss.name, COUNT(v.user_id) AS vote_count
-FROM study_spot ss
-LEFT JOIN votes v ON ss.location_id = v.location_id
-GROUP BY ss.location_id
-ORDER BY vote_count DESC;
-
--- get user's friends
-SELECT u.user_id, u.username, f.status
-FROM friends_list f
-JOIN user u ON f.user_id_2 = u.user_id
-WHERE f.user_id_1 = 1 AND f.status = 'accepted';
-
--- get who is checked in
-SELECT u.user_id, u.username, c.check_in_time
-FROM check_in c
-JOIN user u ON c.user_id = u.user_id
-WHERE c.location_id = 1 AND c.check_out_time IS NULL;
-
--- getting select alls
-SELECT * FROM user;
-SELECT * FROM study_spot;
-SELECT * FROM votes;
-SELECT * FROM fave_spot;
-SELECT * FROM check_in;
-SELECT * FROM friends_list;
-
--- DROP TABLE friends_list;
--- DROP TABLE check_in;
--- DROP TABLE fave_spot;
--- DROP TABLE votes;
--- DROP TABLE study_spot;
--- DROP TABLE user;
+--
+--INSERT INTO `votes` (`user_id`, `location_id`) VALUES (1, 1);
+--
+--INSERT INTO `fave_spot` (`user_id`, `location_id`) VALUES (1, 1);
+--
+--INSERT INTO `check_in` (`user_id`, `location_id`, `check_in_time`)
+--VALUES (1, 1, NOW());
+--
+--INSERT INTO `friends_list` (`user_id_1`, `user_id_2`, `status`) VALUES (1, 2, 'accepted');
+--
+---- SOME USEFUL SCRIPTS
+---- get all study spots
+--SELECT location_id, name, description FROM study_spot;
+--
+---- get user and password
+--SELECT username, password FROM user;
+--
+---- get a user's favorite spots
+--SELECT ss.location_id, ss.name, ss.description
+--FROM fave_spot fs
+--JOIN study_spot ss ON fs.location_id = ss.location_id
+--WHERE fs.user_id = 1;
+--
+---- get votes on spots
+--SELECT ss.location_id, ss.name, COUNT(v.user_id) AS vote_count
+--FROM study_spot ss
+--LEFT JOIN votes v ON ss.location_id = v.location_id
+--GROUP BY ss.location_id
+--ORDER BY vote_count DESC;
+--
+---- get user's friends
+--SELECT u.user_id, u.username, f.status
+--FROM friends_list f
+--JOIN user u ON f.user_id_2 = u.user_id
+--WHERE f.user_id_1 = 1 AND f.status = 'accepted';
+--
+---- get who is checked in
+--SELECT u.user_id, u.username, c.check_in_time
+--FROM check_in c
+--JOIN user u ON c.user_id = u.user_id
+--WHERE c.location_id = 1 AND c.check_out_time IS NULL;
+--
+---- getting select alls
+--SELECT * FROM user;
+--SELECT * FROM study_spot;
+--SELECT * FROM votes;
+--SELECT * FROM fave_spot;
+--SELECT * FROM check_in;
+--SELECT * FROM friends_list;
 
 
 
