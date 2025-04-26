@@ -3,10 +3,17 @@ import { Link } from 'react-router-dom';
 
 const LoginPage = () => {
   // State for storing form values
+  const navigate = useNavigate();
+
+  // State for storing form values - changed userId to username to match backend
   const [credentials, setCredentials] = useState({
-    userId: '',
+    username: '',
     password: ''
   });
+
+  // Added states for error handling and loading
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   // Handle form input changes
   const handleChange = (e) => {
@@ -22,7 +29,32 @@ const LoginPage = () => {
     // Must enter some values
     e.preventDefault();
     console.log('Login credentials:', credentials);
+    setIsLoading(true);
     // Add API call for authentication later
+    try {
+      const response = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      const data = await response.text();
+
+      if (response.ok) {
+        console.log('Login successful:', data);
+        // Redirect to main page after successful login
+        navigate('/');
+      } else {
+        setError(data || 'Login failed. Please check your credentials.');
+      }
+    } catch (error) {
+      setError('An error occurred during login. Please try again.');
+      console.error('Login error:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Styles for the component
@@ -75,6 +107,7 @@ const LoginPage = () => {
   return (
     <div style={styles.container}>
       <h2 style={styles.title}>Login</h2>
+      {error && <div style={{color: 'red', marginBottom: '10px'}}>{error}</div>}
       <form style={styles.form} onSubmit={handleSubmit}>
         <div style={styles.inputGroup}>
           <label htmlFor="userId">Username</label>
@@ -100,8 +133,8 @@ const LoginPage = () => {
             required
           />
         </div>
-        <button type="submit" style={styles.button}>
-          Login
+        <button type="submit" style={styles.button} disabled={isLoading}>
+          {isLoading ? 'Logging in...' : 'Login'}
         </button>
       </form>
       <Link to="/signup" style={styles.link}>

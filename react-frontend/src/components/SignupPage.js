@@ -27,9 +27,40 @@ const SignupPage = () => {
       alert("Passwords don't match!");
       return;
     }
-    
+
     console.log('New user data:', newUser);
-    // Add API call for registration later
+    try {
+      // Create a user object without confirmPassword for the API
+      const userToRegister = {
+        username: newUser.username,
+        email: newUser.email,
+        password: newUser.password
+      };
+
+      const response = await fetch('http://localhost:8080/api/auth/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userToRegister),
+      });
+
+      const data = await response.text();
+
+      if (response.ok) {
+        console.log('Registration successful:', data);
+        // Redirect to login page after successful registration
+        navigate('/login');
+      } else {
+        setError(data || 'Registration failed. Please try again.');
+      }
+    } catch (error) {
+      setError('An error occurred during registration. Please try again.');
+      console.error('Registration error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+
   };
 
   // Styles for the component
@@ -80,54 +111,72 @@ const SignupPage = () => {
   };
 
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>Sign Up</h2>
-      <form style={styles.form} onSubmit={handleSignup}>
-        <div style={styles.inputGroup}>
-          <label htmlFor="username">Username</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            style={styles.input}
-            value={newUser.username}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div style={styles.inputGroup}>
-          <label htmlFor="password">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            style={styles.input}
-            value={newUser.password}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div style={styles.inputGroup}>
-          <label htmlFor="confirmPassword">Confirm Password</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            style={styles.input}
-            value={newUser.confirmPassword}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <button type="submit" style={styles.button}>
-          Sign Up
-        </button>
-      </form>
-      <Link to="/login" style={styles.link}>
-        Already have an account? Login
-      </Link>
-    </div>
-  );
-};
+  <div style={styles.container}>
+    <h2 style={styles.title}>Sign Up</h2>
+    {/* error message display */}
+    {error && <div style={{color: 'red', marginBottom: '10px'}}>{error}</div>}
+    <form onSubmit={handleSignup} style={styles.form}>
+      <div style={styles.inputGroup}>
+        <label htmlFor="username">Username</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          value={newUser.username}
+          onChange={handleChange}
+          style={styles.input}
+          required
+        />
+      </div>
+
+      {/* email field */}
+      <div style={styles.inputGroup}>
+        <label htmlFor="email">Email</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          value={newUser.email}
+          onChange={handleChange}
+          style={styles.input}
+          required
+        />
+      </div>
+
+      <div style={styles.inputGroup}>
+        <label htmlFor="password">Password</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          value={newUser.password}
+          onChange={handleChange}
+          style={styles.input}
+          required
+        />
+      </div>
+
+      <div style={styles.inputGroup}>
+        <label htmlFor="confirmPassword">Confirm Password</label>
+        <input
+          type="password"
+          id="confirmPassword"
+          name="confirmPassword"
+          value={newUser.confirmPassword}
+          onChange={handleChange}
+          style={styles.input}
+          required
+        />
+      </div>
+
+      {/* Update button to show loading state */}
+      <button type="submit" style={styles.button} disabled={isLoading}>
+        {isLoading ? 'Signing up...' : 'Sign Up'}
+      </button>
+    </form>
+    <Link to="/login" style={styles.link}>Already have an account? Login</Link>
+  </div>
+);
+
 
 export default SignupPage;
