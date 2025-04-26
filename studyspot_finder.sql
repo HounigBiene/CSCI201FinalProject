@@ -1,12 +1,19 @@
 create SCHEMA IF NOT EXISTS studyspot_finder;
 USE studyspot_finder;
 
+DROP TABLE IF EXISTS friends_list;
+DROP TABLE IF EXISTS check_in;
+DROP TABLE IF EXISTS fave_spot;
+DROP TABLE IF EXISTS votes;
+DROP TABLE IF EXISTS study_spot;
+DROP TABLE IF EXISTS user;
+
 CREATE TABLE `user`(
     `user_id` INT AUTO_INCREMENT PRIMARY KEY,
     `username` VARCHAR(30) NOT NULL,
     `email` VARCHAR(100) NOT NULL,
     `phone` VARCHAR(20) NOT NULL,
-    `password` VARCHAR(255) NOT NULL, /* to store pashward hash */
+    `password` VARCHAR(255) NOT NULL, /* to store password hash */
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -51,15 +58,6 @@ CREATE TABLE `friends_list` (
     FOREIGN KEY (`user_id_1`) REFERENCES user(`user_id`),
     FOREIGN KEY (`user_id_2`) REFERENCES user(`user_id`)
 );
-
--- SELECT * FROM fav_spot;
--- DROP TABLE friends_list;
--- DROP TABLE check_in;
--- DROP TABLE fave_spot;
--- DROP TABLE votes;
--- DROP TABLE study_spot;
--- DROP TABLE user;
-
 
 
 
