@@ -211,70 +211,6 @@ const Dashboard = ({ isOpen, toggleDashboard }) => {
   );
 };
 
-// Top Navigation Bar component with USC colors
-const TopNavigationBar = ({ toggleDashboard, isOpen }) => {
-  const navbarStyle = {
-    backgroundColor: '#990000', // USC Cardinal color
-    height: '50px',
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '0 15px',
-    boxSizing: 'border-box',
-    position: 'relative',
-    borderBottom: '5px solid #FFCC00', // USC Gold/Yellow strip
-    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-    zIndex: 1001
-  };
-
-  const dashboardButtonStyle = {
-    backgroundColor: '#770000', // Slightly darker than the navbar
-    color: 'white',
-    border: 'none',
-    padding: '6px 12px',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
-    transition: 'background-color 0.2s',
-    fontSize: '16px'
-  };
-
-  const navLinksContainerStyle = {
-    display: 'flex',
-    gap: '15px'
-  };
-
-  const navLinkStyle = {
-    color: 'white',
-    textDecoration: 'none',
-    fontWeight: 'bold',
-    padding: '5px 10px',
-    borderRadius: '4px',
-    transition: 'background-color 0.2s',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)'
-  };
-
-  return (
-    <div style={navbarStyle}>
-      <button
-        style={dashboardButtonStyle}
-        onClick={toggleDashboard}
-      >
-        {isOpen ? '← Close Menu' : '☰ Menu'}
-      </button>
-
-      <div style={navLinksContainerStyle}>
-        <Link to="/login" style={navLinkStyle}>Login</Link>
-        <Link to="/signup" style={navLinkStyle}>Sign Up</Link>
-      </div>
-    </div>
-  );
-};
-
 const MainPage = () => {
   const [center, setCenter] = useState([51.505, -0.09]); // Default to London
   const [markers, setMarkers] = useState([]);
@@ -309,9 +245,6 @@ const MainPage = () => {
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
-      {/* Top Navigation Bar */}
-      <TopNavigationBar toggleDashboard={toggleDashboard} isOpen={dashboardOpen} />
-
       {/* Dashboard */}
       <Dashboard isOpen={dashboardOpen} toggleDashboard={toggleDashboard} />
 

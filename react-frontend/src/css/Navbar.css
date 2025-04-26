@@ -6,10 +6,17 @@
     top: 0;
     width: 100%;
     z-index: 40;
-    background-color: rgba(10, 10, 10, 0.8);
+    background-color: #990000;
     backdrop-filter: blur(10px); /* Simulates a blurred background */
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 50px;
+  }
+
+  #second-color {
+    background-color: #FFC72C;
+    position: fixed;
+    top: 50px;
   }
   
   /* Inner container to center the content and set max width */

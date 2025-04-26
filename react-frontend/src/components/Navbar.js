@@ -14,7 +14,7 @@ export const Navbar = ({ menuOpen, setMenuOpen }) => {
   const handleNavigation = (sectionId) => {
     if (location.pathname !== '/') {
       // If we're not on the homepage, navigate to homepage with the section hash
-      navigate('/#' + sectionId);
+      navigate('/' + sectionId);
     } else {
       // If already on homepage, scroll to the section smoothly
       document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
@@ -29,7 +29,7 @@ export const Navbar = ({ menuOpen, setMenuOpen }) => {
             onClick={() => handleNavigation('home')} 
             className="navbar-logo"
           >  
-            LOGO
+            USCStudySpot
           </a> 
 
           <div 
@@ -59,6 +59,18 @@ export const Navbar = ({ menuOpen, setMenuOpen }) => {
               My Spots 
             </a>
             <a 
+              onClick={() => handleNavigation('signup')} 
+              className="navbar-link"
+            > 
+              Sign Up
+            </a>
+            <a 
+              onClick={() => handleNavigation('login')} 
+              className="navbar-link"
+            > 
+              Log In
+            </a>
+            <a 
               onClick={() => handleNavigation('myaccount')} 
               className="navbar-link"
             > 
@@ -67,6 +79,7 @@ export const Navbar = ({ menuOpen, setMenuOpen }) => {
           </div>
         </div>
       </div>
+      <span id="second-color" />
     </nav>
   );
 };
