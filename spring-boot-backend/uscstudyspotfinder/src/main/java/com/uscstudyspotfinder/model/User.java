@@ -59,3 +59,15 @@ public class User {
         this.id = id;
     }
 }
+
+
+@OneToMany
+private List<User> friends = new ArrayList<>();
+
+public List<User> getFriends() {
+    return friends;
+}
+
+public void addFriend(User user) {
+    this.friends.add(user);
+}
