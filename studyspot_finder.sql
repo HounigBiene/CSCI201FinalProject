@@ -12,7 +12,6 @@ CREATE TABLE IF NOT EXISTS `users`(
     `user_id` INT AUTO_INCREMENT PRIMARY KEY,
     `username` VARCHAR(30) NOT NULL,
     `email` VARCHAR(100) NOT NULL,
-    `phone` VARCHAR(20) NOT NULL,
     `password` VARCHAR(255) NOT NULL, /* to store password hash */
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP
 );
@@ -62,4 +61,10 @@ CREATE TABLE IF NOT EXISTS `friends_list` (
 GRANT ALL PRIVILEGES ON studyspot_finder.* TO 'root'@'localhost';
 FLUSH PRIVILEGES;
 
-
+INSERT INTO `study_spot` (`name`, `description`, `location_pin`) VALUES
+('Leavey Library', 'Quiet environment with many study cubicles', ST_GeomFromText('POINT(-118.2851 34.0219)')),
+('Fertitta Hall', 'Modern business building with open seating, natural light, and great WiFi', ST_GeomFromText('POINT(-118.2853 34.0198)')),
+('Ronald Tutor Campus Center', 'Central student hub with lounges, food court, and study spaces', ST_GeomFromText('POINT(-118.2857 34.0205)')),
+('Engineering Quad', 'Sunny open-air seating with power outlets', ST_GeomFromText('POINT(-118.2895 34.0212)')),
+('Annenberg Cafe', 'Modern space with lots of plugs and good coffee', ST_GeomFromText('POINT(-118.2870 34.0210)')),
+('Doheny Library', 'Historic library with silent floors', ST_GeomFromText('POINT(-118.2847 34.0215)'));
