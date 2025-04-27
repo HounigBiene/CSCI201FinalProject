@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
 import MainPage from './components/MainPage';
+import MySpots from './components/MySpots';
 import { Navbar } from './components/Navbar';
 
 function App() {
@@ -18,6 +19,9 @@ function App() {
         {/* Keep login and signup routes*/}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+
+          <Route path="/" element={<MainPage />} />
+          <Route path="/myspots" element={<MySpots />} />
 
         {/* Catch any other routes and redirect to main page */}
         <Route path="*" element={<Navigate to="/" />} />
