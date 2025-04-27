@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import "../css/Navbar.css"; 
 
 export const Navbar = ({ menuOpen, setMenuOpen }) => {
@@ -25,12 +25,7 @@ export const Navbar = ({ menuOpen, setMenuOpen }) => {
     <nav className="navbar">
       <div className="navbar-container">
         <div className="navbar-content">
-          <a 
-            onClick={() => handleNavigation('home')} 
-            className="navbar-logo"
-          >  
-            LOGO
-          </a> 
+          <Link to="/" className="navbar-logo">USCStudySpot</Link>
 
           <div 
             className="navbar-menu-icon" 
@@ -40,12 +35,6 @@ export const Navbar = ({ menuOpen, setMenuOpen }) => {
           </div>
 
           <div className="navbar-links">
-            <a 
-              onClick={() => handleNavigation('uscmap')} 
-              className="navbar-link"
-            > 
-              USC Map
-            </a>
             <a 
               onClick={() => handleNavigation('friends')} 
               className="navbar-link"
@@ -58,6 +47,8 @@ export const Navbar = ({ menuOpen, setMenuOpen }) => {
             > 
               My Spots 
             </a>
+            <Link to="/signup" className="navbar-link">Sign Up</Link>
+            <Link to="/login" className="navbar-link">Log In</Link>
             <a 
               onClick={() => handleNavigation('myaccount')} 
               className="navbar-link"
@@ -67,6 +58,7 @@ export const Navbar = ({ menuOpen, setMenuOpen }) => {
           </div>
         </div>
       </div>
+      <span id="second-color" />
     </nav>
   );
 };
