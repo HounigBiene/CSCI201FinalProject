@@ -68,3 +68,20 @@ INSERT INTO `study_spot` (`name`, `description`, `location_pin`) VALUES
 ('Engineering Quad', 'Sunny open-air seating with power outlets', ST_GeomFromText('POINT(-118.2895 34.0212)')),
 ('Annenberg Cafe', 'Modern space with lots of plugs and good coffee', ST_GeomFromText('POINT(-118.2870 34.0210)')),
 ('Doheny Library', 'Historic library with silent floors', ST_GeomFromText('POINT(-118.2847 34.0215)'));
+
+-- Users
+INSERT INTO users (username, email, password) VALUES ('charlotte', 'charlotte@usc.edu', 'pw');
+INSERT INTO users (username, email, password) VALUES ('bob', 'bob@usc.edu', 'pw');
+INSERT INTO users (username, email, password) VALUES ('alice', 'alice@usc.edu', 'pw');
+
+SELECT * FROM users;
+
+
+-- Friends (charlotte -> bob accepted, charlotte -> alice accepted)
+INSERT INTO friends_list (user_id_1, user_id_2, status) VALUES (1, 2, 'accepted');
+INSERT INTO friends_list (user_id_1, user_id_2, status) VALUES (1, 3, 'accepted');
+
+SELECT * FROM friends_list;
+
+-- Checkins
+INSERT INTO check_in (user_id, location_id, check_in_time) VALUES (2, 1, NOW());
