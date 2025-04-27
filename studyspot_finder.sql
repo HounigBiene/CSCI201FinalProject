@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS votes;
 DROP TABLE IF EXISTS study_spot;
 DROP TABLE IF EXISTS user;
 
-CREATE TABLE `user`(
+CREATE TABLE `users`(
     `user_id` INT AUTO_INCREMENT PRIMARY KEY,
     `username` VARCHAR(30) NOT NULL,
     `email` VARCHAR(100) NOT NULL,
@@ -59,6 +59,7 @@ CREATE TABLE `friends_list` (
     FOREIGN KEY (`user_id_2`) REFERENCES user(`user_id`)
 );
 
-
+GRANT ALL PRIVILEGES ON studyspot_finder.* TO 'root'@'localhost';
+FLUSH PRIVILEGES;
 
 
