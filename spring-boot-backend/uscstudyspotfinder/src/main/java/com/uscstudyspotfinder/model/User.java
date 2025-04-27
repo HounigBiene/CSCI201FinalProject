@@ -14,11 +14,10 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    private String username;
+    private Long user_id;
     private String password;
-    private String email;    
+    private String username;
+    private String email;
 
     @OneToMany
     private List<User> friends = new ArrayList<>();
@@ -32,8 +31,8 @@ public class User {
         this.email = email;
     }
 
-    public Long getId() {
-        return this.id;        
+    public Long getUserId() {
+        return this.user_id;        
     }
 
     public String getUsername() {
@@ -68,7 +67,7 @@ public class User {
         this.email = email;        
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setUserId(Long user_id) {
+        this.user_id = user_id;
     }
 }
