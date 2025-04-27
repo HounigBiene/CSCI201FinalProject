@@ -60,14 +60,14 @@ public class User {
     }
 }
 
-
-@OneToMany
-private List<User> friends = new ArrayList<>();
-
-public List<User> getFriends() {
-    return friends;
-}
-
-public void addFriend(User user) {
-    this.friends.add(user);
-}
+//
+//@OneToMany
+//private List<User> friends = new ArrayList<>();
+//
+//public List<User> getFriends() {
+//    return friends;
+//}
+//
+//public void addFriend(User user) {
+//    this.friends.add(user);
+//}
