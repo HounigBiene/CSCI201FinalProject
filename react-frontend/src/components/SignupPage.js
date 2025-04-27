@@ -36,9 +36,9 @@ const SignupPage = () => {
 
     try {
       const userToRegister = {
-        username: data.username,
-        email: data.email,
-        password: data.password
+        username: newUser.username,
+        email: newUser.email,
+        password: newUser.password
       };
 
       const response = await fetch('http://localhost:8080/api/auth/signup', {
@@ -51,10 +51,7 @@ const SignupPage = () => {
         navigate('/login');
       } else {
         const errorData = await response.text();
-        setError('root.serverError', {
-          type: 'manual',
-          message: errorData || 'Registration failed. Please try again.'
-        });
+        setError(errorData || 'Registration failed. Please try again.');
       }
     } catch (error) {
       setError('root.serverError', {
