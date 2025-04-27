@@ -4,7 +4,6 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { Friend } from './Friend';
 
-// Fix for Leaflet default marker icon issue
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
 const redIcon = new L.Icon({
@@ -84,13 +83,31 @@ const EditableMarker = ({ marker, onEditClick, onDeleteClick }) => (
 );
 
 const MainPage = ({ friendOpen, toggleFriend }) => {
-  const [center, setCenter] = useState([51.505, -0.09]);
-  const [markers, setMarkers] = useState([]);
+  const [center, setCenter] = useState([34.02051, -118.28563]); // Centered on USC
+  const [markers, setMarkers] = useState([]); // User-added markers
+  const [dbSpots, setDbSpots] = useState([]); // Spots from database
   const [dashboardOpen, setDashboardOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [description, setDescription] = useState('');
   const [clickPosition, setClickPosition] = useState(null);
   const [selectedMarkerKey, setSelectedMarkerKey] = useState(null);
+
+  useEffect(() => {
+    const fetchStudySpots = async () => {
+      try {        
+        const response = await fetch('http://localhost:8080/api/studyspots');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setDbSpots(data);
+      } catch (error) {
+        console.error("Failed to fetch study spots:", error);
+      }
+    };
+
+    fetchStudySpots();
+  }, []); // Empty dependency array ensures this runs only once on mount
 
   const toggleDashboard = (e) => {
     if (e) e.stopPropagation();
@@ -173,7 +190,7 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
         <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 55px)', marginTop: '55px' }}>
           <MapContainer
               center={center}
-              zoom={13}
+              zoom={15} // Zoomed in a bit more for campus view
               style={{ height: '100%', width: '100%' }}
           >
             <TileLayer
@@ -184,11 +201,25 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
             <MapClickHandler setClickPosition={setClickPosition} setSelectedMarkerKey={setSelectedMarkerKey} setDescription={setDescription} setPanelOpen={setPanelOpen} />
             <LocationMarker setCenter={setCenter} />
 
-            {clickPosition && (
+            {clickPosition && !selectedMarkerKey && (
                 <Marker position={clickPosition} icon={blueIcon}>
-                  <Popup>New Spot</Popup>
+                  <Popup>New Spot Location</Popup>
                 </Marker>
             )}
+
+            {dbSpots.map(spot => (
+                <Marker
+                  key={`db-${spot.locationId}`}
+                  position={[spot.latitude, spot.longitude]}
+                  icon={blueIcon} // Use blue icon for DB spots for now
+                >
+                  <Popup>
+                    <strong>{spot.name || 'Study Spot'}</strong><br />
+                    {spot.description || 'No description.'}<br/>
+                    Coordinates: {spot.latitude.toFixed(5)}, {spot.longitude.toFixed(5)}
+                  </Popup>
+                </Marker>
+            ))}
 
             {markers.map(marker => (
                 <EditableMarker
@@ -199,6 +230,7 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
                       setSelectedMarkerKey(marker.key);
                       setDescription(marker.description || '');
                       setPanelOpen(true);
+                      setClickPosition(null);
                     }}
                     onDeleteClick={(e) => {
                       e.stopPropagation();
