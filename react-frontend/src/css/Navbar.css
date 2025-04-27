@@ -1,80 +1,72 @@
-/* Navbar.css */
-
-/* Container for the navbar */
 .navbar {
     position: fixed;
     top: 0;
     width: 100%;
-    z-index: 40;
-    background-color: rgba(10, 10, 10, 0.8);
-    backdrop-filter: blur(10px); /* Simulates a blurred background */
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Inner container to center the content and set max width */
-  .navbar-container {
-    max-width: 64rem; /* approx. equivalent to Tailwind's max-w-5xl */
-    margin: 0 auto;
-    padding: 0 1rem; /* approximate of Tailwind's px-4 */
-  }
-  
-  /* Flex container for the navbar items */
-  .navbar-content {
+    height: 50px;
+    background-color: #990000;
+    border-bottom: 5px solid #FFC72C;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    z-index: 1001;
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    height: 4rem; /* equivalent to Tailwind's h-16 */
-  }
-  
-  /* Logo styling with gradient text */
-  .navbar-logo {
+    justify-content: space-between;
+    padding: 0 1rem;
+    box-sizing: border-box;
+}
+
+.navbar-container {
+    max-width: 64rem; 
+    margin: 0 auto;
+    padding: 0 1rem; 
+}
+
+.navbar-logo {
+    left: 0;
+    color: #FFC72C;
     font-family: monospace;
-    font-size: 1.25rem; /* roughly equivalent to text-xl */
+    font-size: 1.25rem;
     font-weight: bold;
-    background: linear-gradient(to right, #7e22ce, #3b82f6); /* from-purple-600 to blue-500 */
-    -webkit-background-clip: text;
-    color: transparent;
+    text-transform: uppercase;
     cursor: pointer;
-  }
-  
-  /* Mobile menu icon (hamburger) styling */
-  .navbar-menu-icon {
-    width: 1.75rem; /* approx. equivalent to w-7 */
-    height: 1.25rem; /* approx. equivalent to h-5 */
+}
+
+.navbar-menu-icon {
+    color: white;
+    width: 1.75rem; 
+    height: 1.25rem; 
     position: relative;
     cursor: pointer;
     z-index: 40;
-    display: block; /* visible on mobile */
-  }
-  
-  /* Desktop links container - hidden on mobile */
-  .navbar-links {
+    display: block; 
+}
+
+.navbar-links {
     display: none;
-  }
-  
-  /* Navbar link styling */
-  .navbar-link {
-    color: #D1D5DB; /* text-gray-300 */
+}
+
+.navbar-link {
+    color: white;
+    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 1px;
     cursor: pointer;
     transition: color 0.3s ease;
     text-decoration: none;
-  }
-  
-  /* Change text color on hover */
-  .navbar-link:hover {
-    color: #ffffff;
-  }
-  
-  /* Media Query: On screens 768px and above, show the desktop links and hide the mobile icon */
-  @media (min-width: 768px) {
+}
+
+.navbar-link:hover {
+    color: #FFC72C;
+}
+
+/* Media Query: On screens 768px and above, show the desktop links and hide the mobile icon */
+@media (min-width: 768px) {
     .navbar-menu-icon {
-      display: none;
+        display: none;
     }
     
     .navbar-links {
-      display: flex;
-      align-items: center;
-      gap: 2rem; /* creates space between the links */
+        display: flex;
+        align-items: center;
+        gap: 2rem; /* creates space between the links */
     }
-  }
+}

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
+import { Dashboard } from './Dashboard';
 
 // Fix for Leaflet default marker icon issue
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -42,7 +43,7 @@ const EditableMarker = ({ position, description: initialDescription, markerKey, 
   const handleDelete = (e) => {
     // Prevent event propagation to the map
     e.stopPropagation();
-    deleteMarker(markerKey);
+    // deleteMarker(markerKey);
   };
 
   return (
@@ -50,7 +51,7 @@ const EditableMarker = ({ position, description: initialDescription, markerKey, 
       <Popup closeButton={true} closeOnClick={false}>
         <div onClick={(e) => e.stopPropagation()}>
           {isEditing ? (
-            <div>
+            <div>s
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -171,110 +172,6 @@ function LocationMarker({ setCenter }) {
   );
 }
 
-// Dashboard component
-const Dashboard = ({ isOpen, toggleDashboard }) => {
-  const dashboardStyle = {
-    position: 'absolute',
-    left: isOpen ? '0' : '-250px',
-    top: '60px', // Adjusted to account for navbar height
-    height: 'calc(100% - 60px)', // Adjusted to account for navbar height
-    width: '250px',
-    backgroundColor: 'white',
-    boxShadow: '2px 0 5px rgba(0,0,0,0.2)',
-    transition: 'left 0.3s ease',
-    zIndex: 1000,
-    padding: '20px',
-    boxSizing: 'border-box'
-  };
-
-  return (
-    <div style={dashboardStyle} onClick={(e) => e.stopPropagation()}>
-      <h2>Dashboard</h2>
-      <ul style={{ listStyle: 'none', padding: 0 }}>
-        <li style={{ padding: '10px 0', borderBottom: '1px solid #eee' }}>
-          <a href="#" style={{ textDecoration: 'none', color: '#333' }}>Home</a>
-        </li>
-        <li style={{ padding: '10px 0', borderBottom: '1px solid #eee' }}>
-          <a href="#" style={{ textDecoration: 'none', color: '#333' }}>Profile</a>
-        </li>
-        <li style={{ padding: '10px 0', borderBottom: '1px solid #eee' }}>
-          <a href="#" style={{ textDecoration: 'none', color: '#333' }}>Maps</a>
-        </li>
-        <li style={{ padding: '10px 0', borderBottom: '1px solid #eee' }}>
-          <a href="#" style={{ textDecoration: 'none', color: '#333' }}>Settings</a>
-        </li>
-        <li style={{ padding: '10px 0', borderBottom: '1px solid #eee' }}>
-          <a href="#" style={{ textDecoration: 'none', color: '#333' }}>Help</a>
-        </li>
-      </ul>
-    </div>
-  );
-};
-
-// Top Navigation Bar component with USC colors
-const TopNavigationBar = ({ toggleDashboard, isOpen }) => {
-  const navbarStyle = {
-    backgroundColor: '#990000', // USC Cardinal color
-    height: '50px',
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '0 15px',
-    boxSizing: 'border-box',
-    position: 'relative',
-    borderBottom: '5px solid #FFCC00', // USC Gold/Yellow strip
-    boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-    zIndex: 1001
-  };
-
-  const dashboardButtonStyle = {
-    backgroundColor: '#770000', // Slightly darker than the navbar
-    color: 'white',
-    border: 'none',
-    padding: '6px 12px',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.3)',
-    transition: 'background-color 0.2s',
-    fontSize: '16px'
-  };
-
-  const navLinksContainerStyle = {
-    display: 'flex',
-    gap: '15px'
-  };
-
-  const navLinkStyle = {
-    color: 'white',
-    textDecoration: 'none',
-    fontWeight: 'bold',
-    padding: '5px 10px',
-    borderRadius: '4px',
-    transition: 'background-color 0.2s',
-    backgroundColor: 'rgba(255, 255, 255, 0.1)'
-  };
-
-  return (
-    <div style={navbarStyle}>
-      <button
-        style={dashboardButtonStyle}
-        onClick={toggleDashboard}
-      >
-        {isOpen ? '← Close Menu' : '☰ Menu'}
-      </button>
-
-      <div style={navLinksContainerStyle}>
-        <Link to="/login" style={navLinkStyle}>Login</Link>
-        <Link to="/signup" style={navLinkStyle}>Sign Up</Link>
-      </div>
-    </div>
-  );
-};
-
 const MainPage = () => {
   const [center, setCenter] = useState([51.505, -0.09]); // Default to London
   const [markers, setMarkers] = useState([]);
@@ -309,9 +206,6 @@ const MainPage = () => {
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
-      {/* Top Navigation Bar */}
-      <TopNavigationBar toggleDashboard={toggleDashboard} isOpen={dashboardOpen} />
-
       {/* Dashboard */}
       <Dashboard isOpen={dashboardOpen} toggleDashboard={toggleDashboard} />
 

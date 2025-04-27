@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import "../css/authstyle.css";
 
 const LoginPage = () => {
   // State for storing form values
@@ -58,87 +58,40 @@ const LoginPage = () => {
     }
   };
 
-  // Styles for the component
-  const styles = {
-    container: {
-      maxWidth: '400px',
-      margin: '100px auto',
-      padding: '20px',
-      boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-      borderRadius: '8px',
-      backgroundColor: 'white'
-    },
-    title: {
-      textAlign: 'center',
-      marginBottom: '20px'
-    },
-    form: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '15px'
-    },
-    inputGroup: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '5px'
-    },
-    input: {
-      padding: '10px',
-      borderRadius: '4px',
-      border: '1px solid #ddd'
-    },
-    button: {
-      padding: '10px',
-      backgroundColor: '#007bff',
-      color: 'white',
-      border: 'none',
-      borderRadius: '4px',
-      cursor: 'pointer',
-      marginTop: '10px'
-    },
-    link: {
-      display: 'block',
-      marginTop: '15px',
-      textAlign: 'center',
-      color: '#007bff',
-      textDecoration: 'none'
-    }
-  };
-
   return (
-    <div style={styles.container}>
-      <h2 style={styles.title}>Login</h2>
-      {error && <div style={{color: 'red', marginBottom: '10px'}}>{error}</div>}
-      <form style={styles.form} onSubmit={handleSubmit}>
-        <div style={styles.inputGroup}>
-          <label htmlFor="userId">Username</label>
+    <div className="auth-container">
+      <h2 className="auth-title">Login</h2>
+      {error && <div className="auth-error">{error}</div>}
+      <form className="auth-form" onSubmit={handleSubmit}>
+        <div className="auth-input-group">
+          <label htmlFor="username">Username</label>
           <input
             type="text"
-            id="userId"
-            name="userId"
-            style={styles.input}
-            value={credentials.userId}
+            id="username"
+            name="username"
+            className="auth-input"
+            value={credentials.username}
             onChange={handleChange}
             required
           />
         </div>
-        <div style={styles.inputGroup}>
+        <div className="auth-input-group">
           <label htmlFor="password">Password</label>
           <input
             type="password"
             id="password"
             name="password"
-            style={styles.input}
+            className="auth-input"
             value={credentials.password}
             onChange={handleChange}
             required
           />
         </div>
-        <button type="submit" style={styles.button} disabled={isLoading}>
+        <button type="submit" className="auth-button" disabled={isLoading}>
           {isLoading ? 'Logging in...' : 'Login'}
         </button>
       </form>
-      <Link to="/signup" style={styles.link}>
+      <Link to="/signup" className="auth-link">
         Don't have an account? Sign up
       </Link>
     </div>

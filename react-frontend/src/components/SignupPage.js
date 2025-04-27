@@ -1,27 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
-
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { Link, useNavigate } from 'react-router-dom';
+import "../css/authstyle.css";
 
 const SignupPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
-  const { register, handleSubmit, setError, formState: { errors } } = useForm();
+  // State for storing form values
+  const [newUser, setNewUser] = useState({
+    username: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+
   const navigate = useNavigate();
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Use react-hook-form's handleSubmit wrapper
-  const onSubmit = async (data) => {
-    setIsLoading(true);
+  // Handle form input changes
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setNewUser({
+      ...newUser,
+      [name]: value
+    });
+  };
 
-    if (data.password !== data.confirmPassword) {
-      setError('confirmPassword', {
-        type: 'manual',
-        message: "Passwords don't match!"
-      });
-      setIsLoading(false);
+  // Handle form submission
+  const handleSignup = async (e) => {
+    e.preventDefault();
+
+    // Check if passwords match
+    if (newUser.password !== newUser.confirmPassword) {
+      alert("Passwords don't match!");
       return;
     }
 
@@ -57,60 +66,13 @@ const SignupPage = () => {
     }
   };
 
-  // Styles for the component
-  const styles = {
-    container: {
-      maxWidth: '400px',
-      margin: '100px auto',
-      padding: '20px',
-      boxShadow: '0 0 10px rgba(0,0,0,0.1)',
-      borderRadius: '8px',
-      backgroundColor: 'white'
-    },
-    title: {
-      textAlign: 'center',
-      marginBottom: '20px'
-    },
-    form: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '15px'
-    },
-    inputGroup: {
-      display: 'flex',
-      flexDirection: 'column',
-      gap: '5px'
-    },
-    input: {
-      padding: '10px',
-      borderRadius: '4px',
-      border: '1px solid #ddd'
-    },
-    button: {
-      padding: '10px',
-      backgroundColor: '#007bff',
-      color: 'white',
-      border: 'none',
-      borderRadius: '4px',
-      cursor: 'pointer',
-      marginTop: '10px'
-    },
-    link: {
-      display: 'block',
-      marginTop: '15px',
-      textAlign: 'center',
-      color: '#007bff',
-      textDecoration: 'none'
-    }
-  };
-
   return (
-  <div style={styles.container}>
-    <h2 style={styles.title}>Sign Up</h2>
+  <div className="auth-container">
+    <h2 className="auth-title">Sign Up</h2>
     {/* error message display */}
-    {error && <div style={{color: 'red', marginBottom: '10px'}}>{error}</div>}
-    <form onSubmit={handleSignup} style={styles.form}>
-      <div style={styles.inputGroup}>
+    {error && <div className="auth-error">{error}</div>}
+    <form onSubmit={handleSignup} className="auth-form">
+      <div className="auth-input-group">
         <label htmlFor="username">Username</label>
         <input
           type="text"
@@ -118,13 +80,13 @@ const SignupPage = () => {
           name="username"
           value={newUser.username}
           onChange={handleChange}
-          style={styles.input}
+          className="auth-input"
           required
         />
       </div>
 
       {/* email field */}
-      <div style={styles.inputGroup}>
+      <div className="auth-input-group">
         <label htmlFor="email">Email</label>
         <input
           type="email"
@@ -132,12 +94,12 @@ const SignupPage = () => {
           name="email"
           value={newUser.email}
           onChange={handleChange}
-          style={styles.input}
+          className="auth-input"
           required
         />
       </div>
 
-      <div style={styles.inputGroup}>
+      <div className="auth-input-group">
         <label htmlFor="password">Password</label>
         <input
           type="password"
@@ -145,12 +107,12 @@ const SignupPage = () => {
           name="password"
           value={newUser.password}
           onChange={handleChange}
-          style={styles.input}
+          className="auth-input"
           required
         />
       </div>
 
-      <div style={styles.inputGroup}>
+      <div className="auth-input-group">
         <label htmlFor="confirmPassword">Confirm Password</label>
         <input
           type="password"
@@ -158,18 +120,18 @@ const SignupPage = () => {
           name="confirmPassword"
           value={newUser.confirmPassword}
           onChange={handleChange}
-          style={styles.input}
+          className="auth-input"
           required
         />
       </div>
 
       {/* Update button to show loading state */}
-      <button type="submit" style={styles.button} disabled={isLoading}>
+      <button type="submit" className="auth-button" disabled={isLoading}>
         {isLoading ? 'Signing up...' : 'Sign Up'}
       </button>
-      </form>
-      <Link to="/login" style={styles.link}>Already have an account? Login</Link>
-    </div>
+    </form>
+    <Link to="/login" className="auth-link">Already have an account? Login</Link>
+  </div>
   );
 };
 
