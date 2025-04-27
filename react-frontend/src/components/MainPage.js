@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Dashboard } from './Dashboard';
+import { Friend } from './Friend';
 
 // Fix for Leaflet default marker icon issue
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -172,7 +172,7 @@ function LocationMarker({ setCenter }) {
   );
 }
 
-const MainPage = () => {
+const MainPage = ({ friendOpen, toggleFriend }) => {
   const [center, setCenter] = useState([51.505, -0.09]); // Default to London
   const [markers, setMarkers] = useState([]);
   const [dashboardOpen, setDashboardOpen] = useState(false);
@@ -206,8 +206,7 @@ const MainPage = () => {
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
-      {/* Dashboard */}
-      <Dashboard isOpen={dashboardOpen} toggleDashboard={toggleDashboard} />
+      <Friend   isOpen={friendOpen}   toggleDashboard={toggleFriend} />
 
       {/* Adjusted container for the map */}
       <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 55px)', marginTop: '55px' }}>

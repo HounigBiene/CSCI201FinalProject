@@ -6,14 +6,18 @@ import MainPage from './components/MainPage';
 import { Navbar } from './components/Navbar';
 
 function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [friendOpen, setFriendOpen] = useState(false);
+  const toggleFriend = (e) => {
+    if (e) e.stopPropagation();
+    setFriendOpen(open => !open);
+  };
 
   return (
     <Router>
-      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+      <Navbar friendOpen={friendOpen} toggleFriend={toggleFriend} />
       <Routes>
         {/* Set MainPage as the default landing page */}
-        <Route path="/" element={<MainPage />} />
+        <Route path="/" element={<MainPage friendOpen={friendOpen} toggleFriend={toggleFriend} />} />
 
         {/* Keep login and signup routes*/}
         <Route path="/login" element={<LoginPage />} />

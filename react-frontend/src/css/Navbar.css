@@ -5,43 +5,35 @@
     height: 50px;
     background-color: #990000;
     border-bottom: 5px solid #FFC72C;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     z-index: 1001;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 1rem;
+    padding: 0.75rem 1rem;
     box-sizing: border-box;
 }
 
 .navbar-container {
-    max-width: 64rem; 
+    max-width: 100%;
     margin: 0 auto;
-    padding: 0 1rem; 
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0;
 }
 
 .navbar-logo {
-    left: 0;
     color: #FFC72C;
     font-family: monospace;
     font-size: 1.25rem;
     font-weight: bold;
     text-transform: uppercase;
+    text-decoration: none;
     cursor: pointer;
 }
 
-.navbar-menu-icon {
-    color: white;
-    width: 1.75rem; 
-    height: 1.25rem; 
-    position: relative;
-    cursor: pointer;
-    z-index: 40;
-    display: block; 
-}
-
-.navbar-links {
-    display: none;
+.navbar-content {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .navbar-link {
@@ -52,21 +44,32 @@
     cursor: pointer;
     transition: color 0.3s ease;
     text-decoration: none;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
 }
 
 .navbar-link:hover {
     color: #FFC72C;
 }
 
-/* Media Query: On screens 768px and above, show the desktop links and hide the mobile icon */
+/* Media Query: On screens 768px and above, hide mobile icon (if used) */
 @media (min-width: 768px) {
     .navbar-menu-icon {
         display: none;
     }
-    
-    .navbar-links {
+}
+
+/* Mobile dropdown (if you implement a hamburger menu) */
+@media (max-width: 767px) {
+    .navbar-links.open {
         display: flex;
-        align-items: center;
-        gap: 2rem; /* creates space between the links */
+        flex-direction: column;
+        position: absolute;
+        top: 50px;
+        left: 0;
+        width: 100%;
+        background-color: #990000;
+        padding: 0.5rem 1rem;
+        gap: 1rem;
     }
 }
