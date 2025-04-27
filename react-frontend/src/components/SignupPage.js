@@ -1,66 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
+
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useForm } from 'react-hook-form';
 
 const SignupPage = () => {
-  // State for storing form values
-  const [newUser, setNewUser] = useState({
-    username: '',
-    password: '',
-    confirmPassword: ''
-  });
+  const [isLoading, setIsLoading] = useState(false);
+  const { register, handleSubmit, setError, formState: { errors } } = useForm();
+  const navigate = useNavigate();
 
-  // Handle form input changes
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setNewUser({
-      ...newUser,
-      [name]: value
-    });
-  };
+  // Use react-hook-form's handleSubmit wrapper
+  const onSubmit = async (data) => {
+    setIsLoading(true);
 
-  // Handle form submission
-  const handleSignup = (e) => {
-    e.preventDefault();
-
-    // Check if passwords match
-    if (newUser.password !== newUser.confirmPassword) {
-      alert("Passwords don't match!");
+    if (data.password !== data.confirmPassword) {
+      setError('confirmPassword', {
+        type: 'manual',
+        message: "Passwords don't match!"
+      });
+      setIsLoading(false);
       return;
     }
 
-    console.log('New user data:', newUser);
     try {
-      // Create a user object without confirmPassword for the API
       const userToRegister = {
-        username: newUser.username,
-        email: newUser.email,
-        password: newUser.password
+        username: data.username,
+        email: data.email,
+        password: data.password
       };
 
       const response = await fetch('http://localhost:8080/api/auth/signup', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userToRegister),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userToRegister)
       });
 
-      const data = await response.text();
-
       if (response.ok) {
-        console.log('Registration successful:', data);
-        // Redirect to login page after successful registration
         navigate('/login');
       } else {
-        setError(data || 'Registration failed. Please try again.');
+        const errorData = await response.text();
+        setError('root.serverError', {
+          type: 'manual',
+          message: errorData || 'Registration failed. Please try again.'
+        });
       }
     } catch (error) {
-      setError('An error occurred during registration. Please try again.');
-      console.error('Registration error:', error);
+      setError('root.serverError', {
+        type: 'manual',
+        message: 'An error occurred during registration. Please try again.'
+      });
     } finally {
       setIsLoading(false);
     }
-
   };
 
   // Styles for the component
@@ -173,10 +167,10 @@ const SignupPage = () => {
       <button type="submit" style={styles.button} disabled={isLoading}>
         {isLoading ? 'Signing up...' : 'Sign Up'}
       </button>
-    </form>
-    <Link to="/login" style={styles.link}>Already have an account? Login</Link>
-  </div>
-);
-
+      </form>
+      <Link to="/login" style={styles.link}>Already have an account? Login</Link>
+    </div>
+  );
+};
 
 export default SignupPage;

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const LoginPage = () => {
   // State for storing form values
@@ -25,7 +26,7 @@ const LoginPage = () => {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     // Must enter some values
     e.preventDefault();
     console.log('Login credentials:', credentials);
