@@ -10,14 +10,16 @@ public class StudySpot {
     private Long id;
 
     private String name;
-    private String location;
+    private String latitude;
+    private String longitude;
     private String description;
 
     public StudySpot() {}
 
-    public StudySpot(String name, String location, String description) {
+    public StudySpot(String name, String latitude, String longitude, String description) {
         this.name = name;
-        this.location = location;
+        this.latitude = latitude;
+        this.longitude = longitude;
         this.description = description;
     }
 
@@ -37,12 +39,20 @@ public class StudySpot {
         this.name = name;
     }
 
-    public String getLocation() {
-        return location;
+    public String getLatitude() {
+        return latitude;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
+    public void setLatitude(String latitude) {
+        this.latitude = latitude;
+    }
+    
+    public String getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(String longitude) {
+        this.longitude = longitude;
     }
 
     public String getDescription() {
