@@ -190,7 +190,7 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
         <div style={{ position: 'relative', width: '100%', height: 'calc(100vh - 55px)', marginTop: '55px' }}>
           <MapContainer
               center={center}
-              zoom={15} // Zoomed in a bit more for campus view
+              zoom={17} // Zoomed in a bit more for campus view
               style={{ height: '100%', width: '100%' }}
           >
             <TileLayer
