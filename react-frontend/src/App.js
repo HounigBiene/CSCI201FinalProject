@@ -3,21 +3,29 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
 import MainPage from './components/MainPage';
+import MySpots from './components/MySpots';
 import { Navbar } from './components/Navbar';
 
 function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [friendOpen, setFriendOpen] = useState(false);
+  const toggleFriend = (e) => {
+    if (e) e.stopPropagation();
+    setFriendOpen(open => !open);
+  };
 
   return (
     <Router>
-      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
+      <Navbar friendOpen={friendOpen} toggleFriend={toggleFriend} />
       <Routes>
         {/* Set MainPage as the default landing page */}
-        <Route path="/" element={<MainPage />} />
+        <Route path="/" element={<MainPage friendOpen={friendOpen} toggleFriend={toggleFriend} />} />
 
         {/* Keep login and signup routes*/}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+
+        <Route path="/" element={<MainPage />} />
+        <Route path="/myspots" element={<MySpots />} />
 
         {/* Catch any other routes and redirect to main page */}
         <Route path="*" element={<Navigate to="/" />} />

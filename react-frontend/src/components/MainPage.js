@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import { Dashboard } from './Dashboard';
+import { Friend } from './Friend';
 
 // Fix for Leaflet default marker icon issue
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -83,7 +83,7 @@ const EditableMarker = ({ marker, onEditClick, onDeleteClick }) => (
     </Marker>
 );
 
-const MainPage = () => {
+const MainPage = ({ friendOpen, toggleFriend }) => {
   const [center, setCenter] = useState([51.505, -0.09]);
   const [markers, setMarkers] = useState([]);
   const [dashboardOpen, setDashboardOpen] = useState(false);
@@ -138,7 +138,7 @@ const MainPage = () => {
 
   return (
       <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
-        <Dashboard isOpen={dashboardOpen} toggleDashboard={toggleDashboard} />
+        <Friend isOpen={friendOpen} toggleDashboard={toggleFriend} />
 
         {panelOpen && (
             <div style={{
