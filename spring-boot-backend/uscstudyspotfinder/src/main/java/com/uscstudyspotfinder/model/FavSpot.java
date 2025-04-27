@@ -3,36 +3,23 @@ package com.uscstudyspotfinder.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "favorite_spots")
+@IdClass(FavSpotId.class)
+@Table(name = "fave_spot")
 public class FavSpot {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Column(nullable = false)
+    @Id
+    @Column(name = "location_id", nullable = false)
     private Long spotId;
 
-    // Default constructor
-    public FavSpot() {
-    }
+    public FavSpot() {}
 
-    // Parameterized constructor
     public FavSpot(Long userId, Long spotId) {
         this.userId = userId;
         this.spotId = spotId;
-    }
-
-    // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
     }
 
     public Long getUserId() {
@@ -54,8 +41,7 @@ public class FavSpot {
     @Override
     public String toString() {
         return "FavSpot{" +
-                "id=" + id +
-                ", userId=" + userId +
+                "userId=" + userId +
                 ", spotId=" + spotId +
                 '}';
     }
