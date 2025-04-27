@@ -24,8 +24,8 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
 
-          <Route path="/" element={<MainPage />} />
-          <Route path="/myspots" element={<MySpots />} />
+        <Route path="/" element={<MainPage />} />
+        <Route path="/myspots" element={<MySpots />} />
 
         {/* Catch any other routes and redirect to main page */}
         <Route path="*" element={<Navigate to="/" />} />

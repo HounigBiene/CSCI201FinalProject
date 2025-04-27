@@ -24,18 +24,15 @@ export const Navbar = ({ friendOpen, toggleFriend }) => {
           <a
             className="navbar-link"
             onClick={() => {
-              handleNavigation("friends");
+              handleNavigation("");
               toggleFriend();
             }}
           >
             Friends
           </a>
-          <a
-            className="navbar-link"
-            onClick={() => handleNavigation("myspots")}
-          >
+          <Link to="/myspots" className="navbar-link">
             My Spots
-          </a>
+          </Link>
           <Link to="/signup" className="navbar-link">
             Sign Up
           </Link>
