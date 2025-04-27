@@ -5,6 +5,9 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "users")
@@ -17,8 +20,10 @@ public class User {
     private String password;
     private String email;    
 
-    public User(){
+    @OneToMany
+    private List<User> friends = new ArrayList<>();
 
+    public User() {
     }
 
     public User(String username, String password, String email) {
@@ -27,47 +32,43 @@ public class User {
         this.email = email;
     }
 
-    public Long getId(){
+    public Long getId() {
         return this.id;        
     }
 
-    public String getUsername(){
+    public String getUsername() {
         return this.username;
     }
 
-    public String getPassword(){
+    public String getPassword() {
         return this.password;
     }
 
-    public String getEmail(){
+    public String getEmail() {
         return this.email;
     }
 
-    public void setUsername(String username){
+    public List<User> getFriends() {
+        return friends;
+    }
+
+    public void addFriend(User user) {
+        this.friends.add(user);
+    }
+
+    public void setUsername(String username) {
         this.username = username;
     }
 
-    public void setPassword(String password){
+    public void setPassword(String password) {
         this.password = password;        
     }
 
-    public void setEmail(String email){
+    public void setEmail(String email) {
         this.email = email;        
     }
 
-    public void setId(Long id){
+    public void setId(Long id) {
         this.id = id;
     }
-}
-
-
-@OneToMany
-private List<User> friends = new ArrayList<>();
-
-public List<User> getFriends() {
-    return friends;
-}
-
-public void addFriend(User user) {
-    this.friends.add(user);
 }
