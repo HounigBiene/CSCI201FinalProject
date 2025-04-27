@@ -3,60 +3,49 @@ package com.uscstudyspotfinder.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "favorite_spots")
+@IdClass(FavSpotId.class)
+@Table(name = "fave_spot")
 public class FavSpot {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
 
-    @Column(nullable = false)
-    private Long userId;
-
-    @Column(nullable = false)
-    private Long spotId;
+    @Column(name = "location_id", nullable = false)
+    private Integer locId;
 
     // Default constructor
     public FavSpot() {
     }
 
     // Parameterized constructor
-    public FavSpot(Long userId, Long spotId) {
+    public FavSpot(Integer userId, Integer locId) {
         this.userId = userId;
-        this.spotId = spotId;
+        this.locId = locId;
     }
 
     // Getters and setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public Long getSpotId() {
-        return spotId;
+    public Integer getSpotId() {
+        return locId;
     }
 
-    public void setSpotId(Long spotId) {
-        this.spotId = spotId;
+    public void setSpotId(Integer locId) {
+        this.locId = locId;
     }
 
     @Override
     public String toString() {
         return "FavSpot{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", spotId=" + spotId +
+                "userId=" + userId +
+                ", locId=" + locId +
                 '}';
     }
 }
