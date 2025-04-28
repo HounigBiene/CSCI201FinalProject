@@ -342,9 +342,15 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
                   icon={blueIcon} // Use blue icon for DB spots for now
                 >
                   <Popup>
-                    <strong>{spot.name || 'Study Spot'}</strong><br />
+                    <strong>{spot.name || 'Study Spot'} (
+                    <span style={{ color: spot.currentCheckInCount >= 5 ? 'red' : spot.currentCheckInCount >= 2 ? 'orange' : 'green' }}>
+                      {spot.currentCheckInCount >= 5 ? 'Busy' : spot.currentCheckInCount >= 2 ? 'Moderate' : 'Empty'}
+                    </span>
+                    )                        
+                    </strong><br />
                     {spot.description || 'No description.'}<br/>
                     Coordinates: {spot.latitude.toFixed(5)}, {spot.longitude.toFixed(5)}
+                    Number of Current People: {spot.currentCheckInCount || 0}
                   </Popup>
                 </Marker>
             ))}
