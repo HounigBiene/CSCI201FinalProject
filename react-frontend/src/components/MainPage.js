@@ -24,7 +24,7 @@ const blueIcon = new L.Icon({
   shadowSize: [41, 41]
 });
 
-function MapClickHandler({ setClickPosition, setSelectedMarkerKey, setDescription, setPanelOpen }) {
+function MapClickHandler({ setClickPosition, setSelectedMarkerKey, setDescription, setSpotName, setPanelOpen }) {
   useMapEvents({
     click: (e) => {
       if (!e.originalEvent.target.closest('.leaflet-popup') &&
@@ -32,6 +32,7 @@ function MapClickHandler({ setClickPosition, setSelectedMarkerKey, setDescriptio
         setClickPosition([e.latlng.lat, e.latlng.lng]);
         setSelectedMarkerKey(null);
         setDescription('');
+        setSpotName('');
         setPanelOpen(true);
       }
     }
@@ -66,6 +67,7 @@ const EditableMarker = ({ marker, onEditClick, onDeleteClick, upvoteMarker, down
     <Marker position={marker.position} icon={blueIcon}>
       <Popup closeButton={true} closeOnClick={false}>
         <div>
+          <h4 style={{ margin: '0 0 5px' }}>{marker.name || 'New Spot'}</h4> 
           <p style={{ minWidth: '200px' }}>{marker.description || 'No description provided'}</p>
           <p>Location: {marker.position[0].toFixed(5)}, {marker.position[1].toFixed(5)}</p>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
@@ -102,6 +104,7 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
   const [dashboardOpen, setDashboardOpen] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [description, setDescription] = useState('');
+  const [spotName, setSpotName]       = useState('');
   const [clickPosition, setClickPosition] = useState(null);
   const [selectedMarkerKey, setSelectedMarkerKey] = useState(null);
   const [userVotes, setUserVotes] = useState({});
@@ -128,9 +131,10 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
     setDashboardOpen(!dashboardOpen);
   };
 
-  const addMarker = (position, description) => {
+  const addMarker = (position, name, description) => {
     setMarkers(current => [...current, {
       position: position,
+      name: name,
       description: description,
       upvotes: 0,
       downvotes: 0,
@@ -151,14 +155,18 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
   };
 
   const handleSave = () => {
+    if (!spotName.trim()) {
+      return alert('Please enter a name for the spot.');
+    }
     if (selectedMarkerKey) {
-      updateMarkerDescription(selectedMarkerKey, description);
+      updateMarkerDescription(selectedMarkerKey, spotName, description);
     } else if (clickPosition) {
-      addMarker(clickPosition, description);
+      addMarker(clickPosition, spotName, description);
     }
     setSelectedMarkerKey(null);
     setClickPosition(null);
     setDescription('');
+    setSpotName('');
     setPanelOpen(false);
   };
 
@@ -247,12 +255,33 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
             }}>
               <div style={{ pointerEvents: 'auto' }}>
                 <h3>{selectedMarkerKey ? 'Edit Marker' : 'Add New Marker'}</h3>
+                <input
+                  type="text"
+                  placeholder="Spot Name"
+                  value={spotName}
+                  onChange={e => setSpotName(e.target.value)}
+                  style={{
+                    width: '100%',
+                    marginBottom: 10,
+                    padding: '8px',
+                    boxSizing: 'border-box'
+                  }}
+                />
                 <textarea
+                    placeholder="Description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     rows={10}
-                    style={{ width: '100%', marginBottom: '10px' }}
-                />
+                    style={{
+                      width: '100%',
+                      marginBottom: 10,
+                      padding: '8px',           
+                      boxSizing: 'border-box',  
+                      fontFamily: 'inherit',    
+                      fontSize: '0.8rem',         
+                      border: '1px solid #ccc', 
+                      borderRadius: '4px'       
+                    }}                />
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <button onClick={handleSave}>Save</button>
                   <button onClick={handleCancel}>Cancel</button>
@@ -272,7 +301,7 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
                 attribution='&copy; OpenStreetMap contributors'
             />
 
-            <MapClickHandler setClickPosition={setClickPosition} setSelectedMarkerKey={setSelectedMarkerKey} setDescription={setDescription} setPanelOpen={setPanelOpen} />
+            <MapClickHandler setClickPosition={setClickPosition} setSelectedMarkerKey={setSelectedMarkerKey} setDescription={setDescription} setSpotName={setSpotName} setPanelOpen={setPanelOpen} />
             <LocationMarker setCenter={setCenter} />
 
             {clickPosition && !selectedMarkerKey && (
