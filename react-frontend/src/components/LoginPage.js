@@ -45,6 +45,9 @@ const LoginPage = () => {
 
       if (response.ok) {
         console.log('Login successful:', data);
+        // Store login status and user ID for future use
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userId', data); // Assuming response contains user ID
         // Redirect to main page after successful login
         navigate('/');
       } else {

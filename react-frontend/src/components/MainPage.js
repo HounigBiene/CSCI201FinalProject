@@ -63,25 +63,7 @@ function LocationMarker({ setCenter }) {
   );
 }
 
-const EditableMarker = ({ marker, onEditClick, onDeleteClick }) => (
-    <Marker position={marker.position} icon={blueIcon}>
-      <Popup closeButton={true} closeOnClick={false}>
-        <div>
-          <p style={{ minWidth: '200px' }}>{marker.description || 'No description provided'}</p>
-          <p>Location: {marker.position[0].toFixed(5)}, {marker.position[1].toFixed(5)}</p>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
-            <button onClick={onEditClick}>Edit</button>
-            <button
-                onClick={onDeleteClick}
-                style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      </Popup>
-    </Marker>
-);
+
 
 const MainPage = ({ friendOpen, toggleFriend }) => {
   const [center, setCenter] = useState([51.505, -0.09]);
@@ -91,6 +73,10 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
   const [description, setDescription] = useState('');
   const [clickPosition, setClickPosition] = useState(null);
   const [selectedMarkerKey, setSelectedMarkerKey] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [favorites, setFavorites] = useState([]);
+  const [favoriteMarkers, setFavoriteMarkers] = useState({});
+
 
   const toggleDashboard = (e) => {
     if (e) e.stopPropagation();
@@ -104,6 +90,80 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
       key: Date.now()
     }]);
   };
+
+  const EditableMarker = ({ marker, onEditClick, onDeleteClick }) => (
+      <Marker position={marker.position} icon={blueIcon}>
+        <Popup>
+          <div>
+            {marker.description || 'No description provided'}
+            <br />
+            Location: {marker.position[0].toFixed(5)}, {marker.position[1].toFixed(5)}
+            <div style={{ marginTop: '10px', display: 'flex', alignItems: 'center' }}>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Your existing edit functionality here
+                }}
+                style={{ marginRight: '5px' }}
+              >
+                Edit
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Your existing delete functionality here
+                }}
+                style={{ marginRight: '5px' }}
+              >
+                Delete
+              </button>
+              <FavoriteStar
+                markerKey={marker.key}
+                isFavorite={favoriteMarkers[marker.key] || false}
+                toggleFavorite={toggleFavorite}
+              />
+            </div>
+          </div>
+        </Popup>
+  
+      </Marker>
+  );
+
+  const toggleFavorite = (markerKey) => {
+    setFavoriteMarkers(prev => ({
+      ...prev,
+      [markerKey]: !prev[markerKey]
+    }));
+    //add API calls here
+  };
+
+
+  const FavoriteStar = ({ markerKey, isFavorite, toggleFavorite }) => {
+    const [isHovered, setIsHovered] = useState(false);
+
+    return (
+      <span
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleFavorite(markerKey);
+        }}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        style={{
+          display: 'inline-block',
+          marginLeft: '10px',
+          cursor: 'pointer',
+          fontSize: '22px',
+          transition: 'transform 0.1s linear',
+          color: isFavorite ? 'gold' : 'gray',
+          transform: isHovered ? 'scale(1.2)' : 'scale(1)',
+        }}
+      >
+        {isFavorite ? '★' : '☆'}
+      </span>
+    );
+  };
+
 
   const updateMarkerDescription = (key, newDescription) => {
     setMarkers(current =>
