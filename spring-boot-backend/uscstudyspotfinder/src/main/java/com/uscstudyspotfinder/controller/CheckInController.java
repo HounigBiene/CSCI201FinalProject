@@ -21,9 +21,9 @@ public class CheckInController {
     private StudySpotRepository studySpotRepository;
 
     @PostMapping("/{locationId}/user/{userId}")
-    public ResponseEntity<String> checkInUser(@PathVariable Integer locationId, @PathVariable Integer userId) {
+    public ResponseEntity<String> checkInUser(@PathVariable Long locationId, @PathVariable Integer userId) {
         StudySpot studySpot = studySpotRepository.findById(locationId)
-                .orElseThrow(() -> new RuntimeException("StudySpot not found."));
+            .orElseThrow(() -> new RuntimeException("StudySpot not found."));
 
         CheckIn checkIn = new CheckIn(userId, LocalDateTime.now(), studySpot, null);
         checkInRepository.save(checkIn);
@@ -32,8 +32,8 @@ public class CheckInController {
     }
 
     @GetMapping("/{locationId}/total")
-    public ResponseEntity<Integer> getTotalCheckedIn(@PathVariable Integer locationId) {
-        Integer totalCheckedIn = checkInRepository.countCurrentCheckIns(locationId);
+    public ResponseEntity<Integer> getTotalCheckedIn(@PathVariable Long locationId) {
+        Integer totalCheckedIn = checkInRepository.countCurrentCheckIns(locationId.intValue());
         return ResponseEntity.ok(totalCheckedIn);
     }
 }
