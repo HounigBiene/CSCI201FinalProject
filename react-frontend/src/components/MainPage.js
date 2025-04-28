@@ -62,7 +62,7 @@ function LocationMarker({ setCenter }) {
   );
 }
 
-const EditableMarker = ({ marker, onEditClick, onDeleteClick }) => (
+const EditableMarker = ({ marker, onEditClick, onDeleteClick, upvoteMarker, downvoteMarker}) => (
     <Marker position={marker.position} icon={blueIcon}>
       <Popup closeButton={true} closeOnClick={false}>
         <div>
@@ -70,6 +70,19 @@ const EditableMarker = ({ marker, onEditClick, onDeleteClick }) => (
           <p>Location: {marker.position[0].toFixed(5)}, {marker.position[1].toFixed(5)}</p>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
             <button onClick={onEditClick}>Edit</button>
+            <button
+                onClick={(e) => { e.stopPropagation(); upvoteMarker(marker.key); }}
+                style={{ backgroundColor: '#28a745', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '10px', verticalAlign:'center'}}
+            >
+              ↑ <span>{marker.upvotes}</span>
+            </button>
+
+            <button
+                onClick={(e) => { e.stopPropagation(); downvoteMarker(marker.key); }}
+                style={{ backgroundColor: '#ffc107', color: 'black', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer', fontSize: '10px', verticalAlign:'center' }}
+            >
+              ↓ <span>{marker.downvotes}</span>
+            </button>
             <button
                 onClick={onDeleteClick}
                 style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
@@ -91,6 +104,7 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
   const [description, setDescription] = useState('');
   const [clickPosition, setClickPosition] = useState(null);
   const [selectedMarkerKey, setSelectedMarkerKey] = useState(null);
+  const [userVotes, setUserVotes] = useState({});
 
   useEffect(() => {
     const fetchStudySpots = async () => {
@@ -118,6 +132,8 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
     setMarkers(current => [...current, {
       position: position,
       description: description,
+      upvotes: 0,
+      downvotes: 0,
       key: Date.now()
     }]);
   };
@@ -151,6 +167,64 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
     setClickPosition(null);
     setDescription('');
     setPanelOpen(false);
+  };
+
+  const upvoteMarker = (key) => {
+    if (userVotes[key] === 'upvote') {
+      //unvote
+      setMarkers(current =>
+          current.map(marker =>
+              marker.key === key ? {...marker, upvotes: marker.upvotes - 1} : marker
+          )
+      );
+      setUserVotes(prev => ({ ...prev, [key]: null }));
+    } else {
+      //if downvoted
+      if (userVotes[key] === 'downvote') {
+        // If so, remove the downvote and update the state
+        setMarkers(current =>
+            current.map(marker =>
+                marker.key === key ? { ...marker, downvotes: marker.downvotes - 1 } : marker
+            )
+        );
+      }
+
+      setMarkers(current =>
+          current.map(marker =>
+              marker.key === key ? {...marker, upvotes: marker.upvotes + 1} : marker
+          )
+      );
+      setUserVotes(prev => ({ ...prev, [key]: 'upvote' }));
+    }
+  }
+
+  const downvoteMarker = (key) => {
+    if(userVotes[key] === 'downvote'){
+      setMarkers(current =>
+          current.map(marker =>
+              marker.key === key ? { ...marker, downvotes: marker.downvotes - 1 } : marker
+          )
+      );
+      setUserVotes(prev => ({ ...prev, [key]: null }));
+
+    } else {
+      //if upvoted
+      if (userVotes[key] === 'upvote') {
+        // If so, remove the downvote and update the state
+        setMarkers(current =>
+            current.map(marker =>
+                marker.key === key ? { ...marker, upvotes: marker.upvotes - 1 } : marker
+            )
+        );
+      }
+
+      setMarkers(current =>
+          current.map(marker =>
+              marker.key === key ? { ...marker, downvotes: marker.downvotes + 1 } : marker
+          )
+      );
+      setUserVotes(prev => ({ ...prev, [key]: 'downvote' }));
+    }
   };
 
   return (
@@ -236,6 +310,8 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
                       e.stopPropagation();
                       deleteMarker(marker.key);
                     }}
+                    upvoteMarker={upvoteMarker}
+                    downvoteMarker={downvoteMarker}
                 />
             ))}
           </MapContainer>
