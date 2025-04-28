@@ -123,6 +123,7 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
   const [clickPosition, setClickPosition] = useState(null);
   const [selectedMarkerKey, setSelectedMarkerKey] = useState(null);
   const [userVotes, setUserVotes] = useState({});
+  const [favoriteMarkers, setFavoriteMarkers] = useState({});
 
   useEffect(() => {
     const fetchStudySpots = async () => {
