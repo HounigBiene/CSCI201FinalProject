@@ -1,22 +1,19 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import "../css/authstyle.css";
 
 const LoginPage = () => {
-  // State for storing form values
   const navigate = useNavigate();
+  const { login } = useAuth(); // Get the login function from context
 
-  // State for storing form values - changed userId to username to match backend
   const [credentials, setCredentials] = useState({
     username: '',
     password: ''
   });
-
-  // Added states for error handling and loading
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Handle form input changes
   const handleChange = (e) => {
     const { name, value } = e.target;
     setCredentials({
@@ -25,33 +22,32 @@ const LoginPage = () => {
     });
   };
 
-  // Handle form submission
   const handleSubmit = async (e) => {
-    // Must enter some values
     e.preventDefault();
     console.log('Login credentials:', credentials);
+    setError('');
     setIsLoading(true);
-    // Add API call for authentication later
+
     try {
       const response = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(credentials),
+        body: JSON.stringify(credentials)
       });
 
-      const data = await response.text();
-
       if (response.ok) {
-        console.log('Login successful:', data);
-        // Store login status and user ID for future use
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userId', data); // Assuming response contains user ID
-        // Redirect to main page after successful login
+        const userData = await response.json();
+        console.log('Login API call successful, received user data:', userData);
+
+        login(userData);
+
         navigate('/');
+
       } else {
-        setError(data || 'Login failed. Please check your credentials.');
+        const errorData = await response.text();
+        setError(errorData || 'Login failed. Please check your credentials.');
       }
     } catch (error) {
       setError('An error occurred during login. Please try again.');
