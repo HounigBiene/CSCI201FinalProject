@@ -3,6 +3,7 @@ package com.uscstudyspotfinder.controller;
 import com.uscstudyspotfinder.model.User;
 import com.uscstudyspotfinder.repository.UserRepository;
 import com.uscstudyspotfinder.dto.LoginRequest;
+import com.uscstudyspotfinder.dto.UserResponseDto;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -61,23 +62,34 @@ public class AuthController {
     
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@RequestBody LoginRequest loginRequest) {
-        try {            
+        try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             loginRequest.getUsername(),
                             loginRequest.getPassword()
                     )
-            );            
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-                        
-            org.springframework.security.core.userdetails.UserDetails userDetails =
-                (org.springframework.security.core.userdetails.UserDetails) authentication.getPrincipal();             
-            return ResponseEntity.ok("User logged in successfully. Welcome " + userDetails.getUsername() + "!");
-        } catch (AuthenticationException e) {            
+            );
+            // SecurityContextHolder.getContext().setAuthentication(authentication);
+            
+            String username = authentication.getName();
+            User user = userRepository.findByUsername(username)
+                 .orElseThrow(() -> new RuntimeException("Authenticated user not found in database"));
+
+            UserResponseDto userDto = new UserResponseDto(
+                user.getUserId(),
+                user.getUsername(),
+                user.getEmail()
+            );
+
+            return ResponseEntity.ok(userDto);
+
+        } catch (AuthenticationException e) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body("Error: Invalid username or password");
-        } catch (Exception e) {            
+        } catch (Exception e) {
+             // Log the exception for debugging
+             // logger.error("Internal error during login for user {}", loginRequest.getUsername(), e);
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error: An internal error occurred during login.");
