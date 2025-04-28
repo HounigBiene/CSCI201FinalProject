@@ -1,10 +1,10 @@
 package com.uscstudyspotfinder.model;
 
 import jakarta.persistence.*;
-import org.locationtech.jts.geom.Point; // Import the JTS Point type
+import org.locationtech.jts.geom.Point;
 
 @Entity
-@Table(name = "study_spot") // Explicitly map to the 'study_spot' table
+@Table(name = "study_spot")
 public class StudySpot {
 
     @Id
@@ -16,11 +16,14 @@ public class StudySpot {
     private String name;
 
     @Column(name = "description", nullable = false, columnDefinition = "TEXT")
-    @Lob // Often used for TEXT/CLOB types, though sometimes optional
+    @Lob
     private String description;
 
-    @Column(name = "location_pin", nullable = false /*, columnDefinition="POINT"*/)
+    @Column(name = "location_pin", nullable = false)
     private Point locationPin;
+
+    @Column(name = "current_check_in_count", nullable = false)
+    private Integer currentCheckInCount = 0;
 
     public StudySpot() {
     }
@@ -29,6 +32,7 @@ public class StudySpot {
         this.name = name;
         this.description = description;
         this.locationPin = locationPin;
+        this.currentCheckInCount = 0;
     }
 
     public Long getLocationId() {
@@ -61,5 +65,13 @@ public class StudySpot {
 
     public void setLocationPin(Point locationPin) {
         this.locationPin = locationPin;
+    }
+
+    public Integer getCurrentCheckInCount() {
+        return currentCheckInCount;
+    }
+
+    public void setCurrentCheckInCount(Integer currentCheckInCount) {
+        this.currentCheckInCount = currentCheckInCount;
     }
 }

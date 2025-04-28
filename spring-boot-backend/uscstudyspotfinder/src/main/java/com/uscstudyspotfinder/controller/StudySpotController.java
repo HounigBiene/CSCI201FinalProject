@@ -46,7 +46,9 @@ public class StudySpotController {
             dto.setLongitude(0.0);        
         }
 
+        // ✅ ADD THIS
+        dto.setCurrentCheckInCount(spot.getCurrentCheckInCount());
+
         return dto;
     }
-
 }
