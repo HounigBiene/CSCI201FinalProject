@@ -63,11 +63,11 @@ function LocationMarker({ setCenter }) {
   );
 }
 
-const EditableMarker = ({ marker, onEditClick, onDeleteClick, upvoteMarker, downvoteMarker}) => (
+const EditableMarker = ({ marker, onEditClick, onDeleteClick, upvoteMarker, downvoteMarker, toggleCheckIn}) => (
     <Marker position={marker.position} icon={blueIcon}>
       <Popup closeButton={true} closeOnClick={false}>
         <div>
-          <h4 style={{ margin: '0 0 5px' }}>{marker.name || 'New Spot'}</h4> 
+          <h4 style={{ margin: '0 0 5px' }}>{marker.name || 'New Spot'}</h4>
           <p style={{ minWidth: '200px' }}>{marker.description || 'No description provided'}</p>
           <p>Location: {marker.position[0].toFixed(5)}, {marker.position[1].toFixed(5)}</p>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '8px' }}>
@@ -90,6 +90,21 @@ const EditableMarker = ({ marker, onEditClick, onDeleteClick, upvoteMarker, down
                 style={{ backgroundColor: '#dc3545', color: 'white', border: 'none', padding: '5px 10px', borderRadius: '4px', cursor: 'pointer' }}
             >
               Delete
+            </button>
+          </div>
+          <div style={{display:'flex', alignItems: 'center', justifyContent: 'center'}}>
+            <button
+              style={{
+                backgroundColor: '#7481a8',
+                color: 'white',
+                border: 'none',
+                padding: '5px 10px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                marginTop: '10px'}}
+              onClick={() => toggleCheckIn(marker.key)}
+              >
+              {marker.checkedIn ? 'Check Out' : 'Check In'}
             </button>
           </div>
         </div>
@@ -235,6 +250,16 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
     }
   };
 
+  const toggleCheckIn = (key) => {
+    // Toggle check-in status for the marker
+    setMarkers(prevMarkers =>
+        prevMarkers.map(marker =>
+            marker.key === key ? { ...marker, checkedIn: !marker.checkedIn } : marker
+        )
+    );
+  };
+
+
   return (
       <div style={{ position: 'relative', width: '100%', height: '100vh' }}>
         <Friend isOpen={friendOpen} toggleDashboard={toggleFriend} />
@@ -341,6 +366,7 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
                     }}
                     upvoteMarker={upvoteMarker}
                     downvoteMarker={downvoteMarker}
+                    toggleCheckIn={toggleCheckIn}
                 />
             ))}
           </MapContainer>
