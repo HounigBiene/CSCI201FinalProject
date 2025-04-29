@@ -28,12 +28,19 @@ public class CheckInController {
         CheckIn checkIn = new CheckIn(userId, LocalDateTime.now(), studySpot, null);
         checkInRepository.save(checkIn);
 
+        // increment people count
+        Integer currentCount = studySpot.getCurrentCheckInCount();
+        studySpot.setCurrentCheckInCount(currentCount + 1);
+        studySpotRepository.save(studySpot);
+
         return ResponseEntity.ok("User checked in successfully.");
     }
 
     @GetMapping("/{locationId}/total")
     public ResponseEntity<Integer> getTotalCheckedIn(@PathVariable Long locationId) {
-        Integer totalCheckedIn = checkInRepository.countCurrentCheckIns(locationId.intValue());
-        return ResponseEntity.ok(totalCheckedIn);
+        StudySpot studySpot = studySpotRepository.findById(locationId)
+            .orElseThrow(() -> new RuntimeException("StudySpot not found."));
+        return ResponseEntity.ok(studySpot.getCurrentCheckInCount());
     }
 }
+//

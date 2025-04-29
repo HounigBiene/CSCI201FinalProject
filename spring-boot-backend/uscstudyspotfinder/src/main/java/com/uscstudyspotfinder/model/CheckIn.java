@@ -67,3 +67,5 @@ public class CheckIn {
         this.checkOutTime = checkOutTime;
     }
 }
+
+//

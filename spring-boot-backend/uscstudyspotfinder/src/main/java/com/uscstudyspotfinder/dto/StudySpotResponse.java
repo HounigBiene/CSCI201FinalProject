@@ -7,16 +7,18 @@ public class StudySpotResponse {
     private String description;
     private double latitude;
     private double longitude;
+    private Integer currentCheckInCount; // ✅ ADD THIS FIELD
 
     public StudySpotResponse() {
     }
 
-    public StudySpotResponse(Long locationId, String name, String description, double latitude, double longitude) {
+    public StudySpotResponse(Long locationId, String name, String description, double latitude, double longitude, Integer currentCheckInCount) {
         this.locationId = locationId;
         this.name = name;
         this.description = description;
         this.latitude = latitude;
         this.longitude = longitude;
+        this.currentCheckInCount = currentCheckInCount;
     }
 
     public Long getLocationId() {
@@ -58,4 +60,14 @@ public class StudySpotResponse {
     public void setLongitude(double longitude) {
         this.longitude = longitude;
     }
+
+    public Integer getCurrentCheckInCount() {
+        return currentCheckInCount;
+    }
+
+    public void setCurrentCheckInCount(Integer currentCheckInCount) {
+        this.currentCheckInCount = currentCheckInCount;
+    }
 }
+
+//

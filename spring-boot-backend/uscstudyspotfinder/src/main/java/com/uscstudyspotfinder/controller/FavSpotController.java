@@ -51,3 +51,5 @@ public class FavSpotController {
         return ResponseEntity.ok("Favorite spot removed successfully.");
     }
 }
+
+//
