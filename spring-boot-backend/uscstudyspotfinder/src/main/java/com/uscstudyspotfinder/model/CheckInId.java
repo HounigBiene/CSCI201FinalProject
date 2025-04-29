@@ -49,3 +49,5 @@ public class CheckInId implements Serializable {
         return Objects.hash(userId, checkInTime);
     }
 }
+
+//

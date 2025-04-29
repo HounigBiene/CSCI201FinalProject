@@ -43,3 +43,4 @@ public class CheckInController {
         return ResponseEntity.ok(studySpot.getCurrentCheckInCount());
     }
 }
+//

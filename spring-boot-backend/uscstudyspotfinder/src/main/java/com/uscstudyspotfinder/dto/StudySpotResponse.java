@@ -69,3 +69,5 @@ public class StudySpotResponse {
         this.currentCheckInCount = currentCheckInCount;
     }
 }
+
+//
