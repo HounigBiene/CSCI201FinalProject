@@ -98,6 +98,9 @@ const EditableMarker = ({
           Location: {marker.position[0].toFixed(5)},{" "}
           {marker.position[1].toFixed(5)}
         </p>
+        <p>
+          Number of Current People: {marker.checkInCount || 0}
+        </p>
         <div
           style={{
             display: "flex",
@@ -239,6 +242,7 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
         description: description,
         upvotes: 0,
         downvotes: 0,
+        checkedIn: false,
         key: Date.now(),
       },
     ]);
@@ -363,12 +367,115 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
 
   const toggleCheckIn = (key) => {
     // Toggle check-in status for the marker
-    setMarkers((prevMarkers) =>
-      prevMarkers.map((marker) =>
+    setMarkers((current) =>
+      current.map((marker) =>
         marker.key === key
-          ? { ...marker, checkedIn: !marker.checkedIn }
+          ? {
+              ...marker,
+              checkedIn: !marker.checkedIn,
+              checkInCount: marker.checkedIn
+                  ? Math.max(0, marker.checkInCount - 1)
+                  : (marker.checkInCount || 0) + 1,
+            }
           : marker
       )
+    );
+  };
+
+
+  const upvoteDbSpot = (key) => {
+    if (userVotes[key] === "upvote") {
+      //unvote
+      setDbSpots((prevSpots) =>
+          prevSpots.map((spot) =>
+              spot.key === key
+                  ? {
+                    ...spot,
+                    upvotes: Math.max(0, (spot.upvotes || 0) - 1),
+                    }
+                  : spot
+          )
+      );
+      setUserVotes((prev) => ({ ...prev, [key]: null }));
+    } else {
+      //if downvoted
+      if (userVotes[key] === "downvote") {
+        // If so, remove the downvote and update the state
+        setDbSpots((prevSpots) =>
+            prevSpots.map((spot) =>
+                spot.key === key
+                    ? { ...spot,
+                      downvotes: Math.max(0, (spot.downvotes || 0) - 1),}
+                    : spot
+            )
+        );
+      }
+
+      setDbSpots((prevSpots) =>
+          prevSpots.map((spot) =>
+              spot.key === key
+                  ? { ...spot,
+                    upvotes: (spot.upvotes || 0) + 1 }
+                  : spot
+          )
+      );
+      setUserVotes((prev) => ({ ...prev, [key]: "upvote" }));
+      // TODO: Connect to database to update upvotes in the backend
+    }
+  };
+
+  const downvoteDbSpot = (key) => {
+    if (userVotes[key] === "downvote") {
+      setDbSpots((prevSpots) =>
+          prevSpots.map((spot) =>
+              spot.key === key
+                  ? { ...spot,
+                    downvotes: Math.max(0, (spot.downvotes || 0) - 1),}
+                  : spot
+          )
+      );
+      setUserVotes((prev) => ({ ...prev, [key]: null }));
+    } else {
+      //if upvoted
+      if (userVotes[key] === "upvote") {
+        // If so, remove the downvote and update the state
+        setDbSpots((prevSpots) =>
+            prevSpots.map((spot) =>
+                spot.key === key
+                    ? { ...spot,
+                      upvotes: Math.max(0, (spot.upvotes || 0) - 1),}
+                    : spot
+            )
+        );
+      }
+
+      setDbSpots((prevSpots) =>
+          prevSpots.map((spot) =>
+              spot.key === key
+                  ? { ...spot, downvotes: (spot.downvotes || 0) + 1 }
+                  : spot
+          )
+      );
+      setUserVotes((prev) => ({ ...prev, [key]: "downvote" }));
+      // TODO: Connect to database to update downvotes in the backend
+    }
+  };
+
+  const toggleDbSpotCheckIn = (key) => {
+    // Toggle check-in status for the marker
+    setDbSpots((prevSpots) =>
+        prevSpots.map((spot) =>
+            spot.key === key
+                ? {
+                  ...spot,
+                  checkedIn: !spot.checkedIn,
+                  currentCheckInCount: spot.checkedIn
+                      ? Math.max(0, (spot.currentCheckInCount || 0) - 1)
+                      : (spot.currentCheckInCount || 0) + 1,
+                }
+                : spot
+        )
+        // TODO: Connect to database
     );
   };
 
@@ -481,7 +588,64 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
                 <br />
                 Coordinates: {spot.latitude.toFixed(5)},{" "}
                 {spot.longitude.toFixed(5)}
-                    Number of Current People: {spot.currentCheckInCount || 0}
+                <p>
+                  Number of Current People: {spot.currentCheckInCount || 0}
+                </p>
+                <div>
+                  <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        upvoteDbSpot(spot.key);
+                      }}
+                      style={{
+                        backgroundColor: "#28a745",
+                        color: "white",
+                        border: "none",
+                        padding: "5px 10px",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        fontSize: "10px",
+                        verticalAlign: "center",
+                        margin: "5px"
+                      }}
+                  >
+                    ↑ <span>{spot.upvotes}</span>
+                  </button>
+
+                  <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        downvoteDbSpot(spot.key);
+                      }}
+                      style={{
+                        backgroundColor: "#ffc107",
+                        color: "black",
+                        border: "none",
+                        padding: "5px 10px",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        fontSize: "10px",
+                        verticalAlign: "center",
+                        margin: "5px"
+                      }}
+                  >
+                    ↓ <span>{spot.downvotes}</span>
+                  </button>
+                  <button
+                      style={{
+                        backgroundColor: "#7481a8",
+                        color: "white",
+                        border: "none",
+                        padding: "5px 10px",
+                        borderRadius: "4px",
+                        cursor: "pointer",
+                        margin: "5px"
+                      }}
+                      onClick={() => toggleDbSpotCheckIn(spot.key)}
+                  >
+                    {spot.checkedIn ? "Check Out" : "Check In"}
+                  </button>
+                </div>
               </Popup>
             </Marker>
           ))}
