@@ -21,6 +21,7 @@ function App() {
           <Route path="/" element={<MainPage friendOpen={friendOpen} toggleFriend={toggleFriend} />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/signup" element={<SignupPage />} />
+          <Route path="/spots" element={<MainPage friendOpen={friendOpen} toggleFriend={toggleFriend} />} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </Router>

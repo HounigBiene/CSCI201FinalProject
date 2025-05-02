@@ -48,8 +48,7 @@ export const Navbar = ({ friendOpen, toggleFriend }) => {
                 My Spots
               </a>
               <a
-                className="navbar-link"
-                onClick={() => handlePlaceholderClick("myaccount")}
+                id="username-display"
               >
                 {currentUser?.username || 'My Account'}
               </a>
