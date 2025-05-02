@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@CrossOrigin(origins = "*") // or specific domain
+@CrossOrigin(origins = "*")
 
 
 @RestController
@@ -51,3 +51,5 @@ public class FavSpotController {
         return ResponseEntity.ok("Favorite spot removed successfully.");
     }
 }
+
+//

@@ -4,25 +4,28 @@ import LoginPage from './components/LoginPage';
 import SignupPage from './components/SignupPage';
 import MainPage from './components/MainPage';
 import { Navbar } from './components/Navbar';
+import { AuthProvider } from './contexts/AuthContext';
 
 function App() {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [friendOpen, setFriendOpen] = useState(false);
+  const toggleFriend = (e) => {
+    if (e) e.stopPropagation();
+    setFriendOpen(open => !open);
+  };
 
   return (
-    <Router>
-      <Navbar menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
-      <Routes>
-        {/* Set MainPage as the default landing page */}
-        <Route path="/" element={<MainPage />} />
-
-        {/* Keep login and signup routes*/}
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/signup" element={<SignupPage />} />
-
-        {/* Catch any other routes and redirect to main page */}
-        <Route path="*" element={<Navigate to="/" />} />
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Navbar friendOpen={friendOpen} toggleFriend={toggleFriend} />
+        <Routes>
+          <Route path="/" element={<MainPage friendOpen={friendOpen} toggleFriend={toggleFriend} />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/spots" element={<MainPage friendOpen={friendOpen} toggleFriend={toggleFriend} />} />
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

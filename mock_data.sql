@@ -25,13 +25,13 @@ SET FOREIGN_KEY_CHECKS = 1;
 */
 
 -- Insert users
-INSERT INTO `user` (`username`, `email`, `phone`, `password`) VALUES
-('alice123', 'alice@example.com', '123-456-7890', 'hashed_pw_1'),
-('bob456', 'bob@example.com', '234-567-8901', 'hashed_pw_2'),
-('carol789', 'carol@example.com', '345-678-9012', 'hashed_pw_3'),
-('dave321', 'dave@example.com', '456-789-0123', 'hashed_pw_4'),
-('eve999', 'eve@example.com', '567-890-1234', 'hashed_pw_5'),
-('frank007', 'frank@example.com', '678-901-2345', 'hashed_pw_6');
+INSERT INTO `users` (`username`, `email`, `password`) VALUES
+('alice123', 'alice@example.com', 'hashed_pw_1'),
+('bob456', 'bob@example.com','hashed_pw_2'),
+('carol789', 'carol@example.com', 'hashed_pw_3'),
+('dave321', 'dave@example.com', 'hashed_pw_4'),
+('eve999', 'eve@example.com', 'hashed_pw_5'),
+('frank007', 'frank@example.com', 'hashed_pw_6');
 
 -- Insert study spots
 INSERT INTO `study_spot` (`name`, `description`, `location_pin`) VALUES
