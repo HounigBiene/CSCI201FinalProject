@@ -7,15 +7,15 @@ import java.util.Objects;
 public class CheckInId implements Serializable {
 
     private Integer userId;
-    private LocalDateTime checkInTime;
+    private Long studySpot;
 
     // Default constructor
     public CheckInId() {}
 
     // Constructor with fields
-    public CheckInId(Integer userId, LocalDateTime checkInTime) {
+    public CheckInId(Integer userId, Long studySpot) {
         this.userId = userId;
-        this.checkInTime = checkInTime;
+        this.studySpot = studySpot;
     }
 
     // Getters and Setters
@@ -27,12 +27,12 @@ public class CheckInId implements Serializable {
         this.userId = userId;
     }
 
-    public LocalDateTime getCheckInTime() {
-        return checkInTime;
+    public Long getStudySpot() {
+        return studySpot;
     }
 
-    public void setCheckInTime(LocalDateTime checkInTime) {
-        this.checkInTime = checkInTime;
+    public void setStudySpot(Long studySpot) {
+        this.studySpot = studySpot;
     }
 
     @Override
@@ -41,12 +41,12 @@ public class CheckInId implements Serializable {
         if (!(o instanceof CheckInId)) return false;
         CheckInId that = (CheckInId) o;
         return Objects.equals(userId, that.userId) &&
-               Objects.equals(checkInTime, that.checkInTime);
+               Objects.equals(studySpot, that.studySpot);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId, checkInTime);
+        return Objects.hash(userId, studySpot);
     }
 }
 

@@ -43,13 +43,15 @@ public class CheckInController {
         return ResponseEntity.ok(studySpot.getCurrentCheckInCount());
     }
 
-    @PostMapping("/api/checkout/{locationId}/user/{userId}")
-    public ResponseEntity<?> checkOut(@PathVariable Integer locationId, @PathVariable Integer userId) {
+    @PostMapping("/{locationId}/user/{userId}/checkout")
+    public ResponseEntity<?> checkOut(@PathVariable Long locationId, @PathVariable Integer userId) {
         // TODO: Fix the checkout time handling logic; Ensure that only one active check-in exists for a user per location
         CheckIn checkIn = checkInRepository.findActiveCheckIn(userId, locationId);
-        //record checkout time
-        checkIn.setCheckOutTime(LocalDateTime.now());
-        checkInRepository.save(checkIn);
+        if (checkIn == null) {
+            return ResponseEntity.badRequest().body("No active check-in found.");
+        }
+        //delete checkout time
+        checkInRepository.delete(checkIn);
 
         // decrease check-in count
         StudySpot studySpot = checkIn.getStudySpot();

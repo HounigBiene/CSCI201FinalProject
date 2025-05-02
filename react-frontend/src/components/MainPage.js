@@ -486,16 +486,50 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       setDbSpots((prevSpots) =>
           prevSpots.map((spot) =>
             spot.locationId === locationId
-            ? {
+                ? {
                   ...spot,
-                  checkedIn: !spot.checkedIn,
-                  currentCheckInCount: spot.checkedIn ? spot.currentCheckInCount - 1 : spot.currentCheckInCount + 1
+                  checkedIn: true,  // Check-in status
+                  currentCheckInCount: spot.currentCheckInCount + 1,  // Increment on check-in
                 }
                 : spot
           )
       );
     } catch (error) {
       console.error('Error during check-in:', error);
+    }
+  };
+
+  const toggleDbSpotCheckOut = async (locationId) => {
+    const { userId } = currentUser;
+    console.log("Checking out with locationId:", locationId, "and userId:", userId); // Debug log
+    if (!userId || !locationId) {
+      console.error('Missing userId or locationId:', userId, locationId);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/checkin/${locationId}/user/${userId}/checkout`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Checkout failed');
+      }
+
+      // Toggle check-out status for the marker
+      setDbSpots((prevSpots) =>
+          prevSpots.map((spot) =>
+              spot.locationId === locationId
+                  ? {
+                    ...spot,
+                    checkedIn: false,  // Set as not checked in
+                    currentCheckInCount: spot.currentCheckInCount - 1,  // Decrement on checkout
+                  }
+                  : spot
+          )
+      );
+    } catch (error) {
+      console.error('Error during checkout:', error);
     }
   };
   return (
@@ -660,7 +694,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
                         cursor: "pointer",
                         margin: "5px"
                       }}
-                      onClick={() => toggleDbSpotCheckIn(spot.locationId)}
+                      onClick={() => spot.checkedIn ? toggleDbSpotCheckOut(spot.locationId) : toggleDbSpotCheckIn(spot.locationId)}
                   >
                     {spot.checkedIn ? "Check Out" : "Check In"}
                   </button>
