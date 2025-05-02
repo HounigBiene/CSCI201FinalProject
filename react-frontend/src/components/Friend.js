@@ -19,10 +19,57 @@ export const Friend = ({ isOpen, toggleDashboard }) => {
 
   // Toggle showing the friends list
   const [showFriends, setShowFriends] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    console.log("searching for " , searchTerm);
+    try{
+      const response = await fetch('/api/users/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: searchTerm })
+      });
+      const data = await response.json();
+      console.log("Results:", data);
+    }
+    catch (error){
+      console.error("could not search for ", error);
+    }
+  };
 
   return (
     <div style={dashboardStyle} onClick={(e) => e.stopPropagation()}>
       <h2>Friends List</h2>
+
+      <div
+      style={{
+        display: 'flex',
+        margin: '5px',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <form onSubmit={handleSubmit}>
+          <><input
+              type="text"
+              id="friend-search"
+              value={(searchTerm)}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search for friends"
+          />
+            <span
+                style={{marginLeft: '8px'}}
+            >
+              <button
+                  type="submit"
+                  className="submit-friend-search"
+              >
+                search
+              </button>
+          </span></>
+        </form>
+      </div>
+
       <div style={{ marginBottom: '10px' }}>
         <button onClick={() => setShowFriends(true)}>+</button>
         <button onClick={() => setShowFriends(false)} style={{ marginLeft: '5px' }}>-</button>
