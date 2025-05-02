@@ -10,6 +10,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Friend } from "./Friend";
 import { useAuth } from '../contexts/AuthContext';
+import { useLocation } from "react-router-dom";
 
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
@@ -189,6 +190,8 @@ const EditableMarker = ({
 );
 
 const MainPage = ({ friendOpen, toggleFriend, userId }) => {
+  const location = useLocation();
+  const isSpotsPage = location.pathname === '/spots';
   const [center, setCenter] = useState([34.02051, -118.28563]); // Centered on USC
   const [markers, setMarkers] = useState([]); // User-added markers
   const [dbSpots, setDbSpots] = useState([]); // Spots from database
@@ -594,13 +597,13 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
         style={{
           position: "relative",
           width: "100%",
-          height: "calc(100vh - 55px)",
-          marginTop: "55px",
+          height: "calc(100vh - 50px)",
+          marginTop: "50px"
         }}
       >
         <MapContainer
           center={center}
-          zoom={15} // Zoomed in a bit more for campus view
+          zoom={16}
           style={{ height: "100%", width: "100%" }}
         >
           <TileLayer
@@ -623,11 +626,11 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
             </Marker>
           )}
 
-          {dbSpots.map((spot) => (
+          {!isSpotsPage && dbSpots.map((spot) => (
             <Marker
               key={`db-${spot.locationId}`}
               position={[spot.latitude, spot.longitude]}
-              icon={blueIcon} // Use blue icon for DB spots for now
+              icon={blueIcon}
             >
               <Popup>
                 <strong>{spot.name || "Study Spot"} (
