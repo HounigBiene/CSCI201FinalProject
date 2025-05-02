@@ -1,7 +1,9 @@
 package com.uscstudyspotfinder.model;
 
 import jakarta.persistence.*;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.GeometryFactory;
 
 @Entity
 @Table(name = "study_spot")
@@ -25,15 +27,24 @@ public class StudySpot {
     @Column(name = "current_check_in_count", nullable = false)
     private Integer currentCheckInCount = 0;
 
+    @Transient
+    private double latitude;
+
+    @Transient
+    private double longitude;
+
     public StudySpot() {
     }
 
-    public StudySpot(String name, String description, Point locationPin) {
+    public StudySpot(String name, String description, double latitude, double longitude) {
         this.name = name;
         this.description = description;
-        this.locationPin = locationPin;
         this.currentCheckInCount = 0;
+
+        GeometryFactory geometryFactory = new GeometryFactory();
+        this.locationPin = geometryFactory.createPoint(new Coordinate(longitude, latitude)); 
     }
+
 
     public Long getLocationId() {
         return locationId;
@@ -73,5 +84,15 @@ public class StudySpot {
 
     public void setCurrentCheckInCount(Integer currentCheckInCount) {
         this.currentCheckInCount = currentCheckInCount;
+    }
+
+    @Transient
+    public double getLatitude() {
+        return locationPin != null ? locationPin.getY() : 0.0;
+    }
+
+    @Transient
+    public double getLongitude() {
+        return locationPin != null ? locationPin.getX() : 0.0;
     }
 }

@@ -27,6 +27,10 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.GeometryFactory;
+
 
 
 @RestController
@@ -40,6 +44,15 @@ public class AddSpotController {
     public ResponseEntity<String> addSpot(@RequestBody StudySpot spotrequest)
     {
 		
+    GeometryFactory geometryFactory = new GeometryFactory();
+    Point location = geometryFactory.createPoint(
+        new Coordinate(spotrequest.getLongitude(), spotrequest.getLatitude())
+    );
+
+    spotrequest.setLocationPin(location);
+
+    System.out.println("About to save spot");
+
 		spotRepository.save(spotrequest);
 		
 		return null;

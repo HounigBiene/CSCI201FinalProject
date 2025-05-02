@@ -278,7 +278,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     setMarkers((current) => current.filter((marker) => marker.key !== key));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!spotName.trim()) {
       return alert("Please enter a name for the spot.");
     }
@@ -286,6 +286,33 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       updateMarker(selectedMarkerKey, spotName, description);
     } else if (clickPosition) {
       addMarker(clickPosition, spotName, description);
+      const data = {
+        name: spotName,
+        description,
+        latitude: clickPosition.lat,
+        longitude: clickPosition.lng
+      };
+      const response = await fetch("http://localhost:8080/api/addspot",
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type' : 'application/json'
+          },
+          body: JSON.stringify(data)
+        }
+      )
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(responseData => {
+        responseData;
+      })
+      .catch(error => {
+        console.log("Error: ", error);
+      });
     }
     setSelectedMarkerKey(null);
     setClickPosition(null);
