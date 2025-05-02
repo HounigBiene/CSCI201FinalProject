@@ -9,6 +9,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import { Friend } from "./Friend";
+import { useAuth } from '../contexts/AuthContext';
 import { useLocation } from "react-router-dom";
 
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
@@ -188,7 +189,7 @@ const EditableMarker = ({
   </Marker>
 );
 
-const MainPage = ({ friendOpen, toggleFriend }) => {
+const MainPage = ({ friendOpen, toggleFriend, userId }) => {
   const location = useLocation();
   const isSpotsPage = location.pathname === '/spots';
   const [center, setCenter] = useState([34.02051, -118.28563]); // Centered on USC
@@ -201,6 +202,10 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
   const [clickPosition, setClickPosition] = useState(null);
   const [selectedMarkerKey, setSelectedMarkerKey] = useState(null);
   const [userVotes, setUserVotes] = useState({});
+  const { currentUser } = useAuth();
+
+  console.log(currentUser);
+  console.log("dbSpots:", dbSpots);
 
   useEffect(() => {
     const fetchStudySpots = async () => {
@@ -464,24 +469,72 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
     }
   };
 
-  const toggleDbSpotCheckIn = (key) => {
-    // Toggle check-in status for the marker
-    setDbSpots((prevSpots) =>
-        prevSpots.map((spot) =>
-            spot.key === key
+  const toggleDbSpotCheckIn = async (locationId) => {
+    const { userId } = currentUser;
+    console.log("Checking in with locationId:", locationId, "and userId:", userId); // Debug log
+    if (!userId || !locationId) {
+      console.error('Missing userId or locationId:', userId, locationId);
+      return;
+    }
+    try {
+      const response = await fetch(`/api/checkin/${locationId}/user/${userId}`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Check-in failed');
+      }
+
+      // Toggle check-in status for the marker
+      setDbSpots((prevSpots) =>
+          prevSpots.map((spot) =>
+            spot.locationId === locationId
                 ? {
                   ...spot,
-                  checkedIn: !spot.checkedIn,
-                  currentCheckInCount: spot.checkedIn
-                      ? Math.max(0, (spot.currentCheckInCount || 0) - 1)
-                      : (spot.currentCheckInCount || 0) + 1,
+                  checkedIn: true,  // Check-in status
+                  currentCheckInCount: spot.currentCheckInCount + 1,  // Increment on check-in
                 }
                 : spot
-        )
-        // TODO: Connect to database
-    );
+          )
+      );
+    } catch (error) {
+      console.error('Error during check-in:', error);
+    }
   };
 
+  const toggleDbSpotCheckOut = async (locationId) => {
+    const { userId } = currentUser;
+    console.log("Checking out with locationId:", locationId, "and userId:", userId); // Debug log
+    if (!userId || !locationId) {
+      console.error('Missing userId or locationId:', userId, locationId);
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/checkin/${locationId}/user/${userId}/checkout`, {
+        method: 'POST',
+      });
+
+      if (!response.ok) {
+        throw new Error('Checkout failed');
+      }
+
+      // Toggle check-out status for the marker
+      setDbSpots((prevSpots) =>
+          prevSpots.map((spot) =>
+              spot.locationId === locationId
+                  ? {
+                    ...spot,
+                    checkedIn: false,  // Set as not checked in
+                    currentCheckInCount: spot.currentCheckInCount - 1,  // Decrement on checkout
+                  }
+                  : spot
+          )
+      );
+    } catch (error) {
+      console.error('Error during checkout:', error);
+    }
+  };
   return (
     <div style={{ position: "relative", width: "100%", height: "100vh" }}>
       <Friend isOpen={friendOpen} toggleDashboard={toggleFriend} />
@@ -644,7 +697,7 @@ const MainPage = ({ friendOpen, toggleFriend }) => {
                         cursor: "pointer",
                         margin: "5px"
                       }}
-                      onClick={() => toggleDbSpotCheckIn(spot.key)}
+                      onClick={() => spot.checkedIn ? toggleDbSpotCheckOut(spot.locationId) : toggleDbSpotCheckIn(spot.locationId)}
                   >
                     {spot.checkedIn ? "Check Out" : "Check In"}
                   </button>
