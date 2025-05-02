@@ -13,12 +13,12 @@ public class CheckIn {
     private Integer userId;
 
     @Id
-    @Column(name = "check_in_time")
-    private LocalDateTime checkInTime;
-
     @ManyToOne
     @JoinColumn(name = "location_id", referencedColumnName = "location_id", nullable = false)
     private StudySpot studySpot;
+
+    @Column(name = "check_in_time")
+    private LocalDateTime checkInTime;
 
     @Column(name = "check_out_time")
     private LocalDateTime checkOutTime;

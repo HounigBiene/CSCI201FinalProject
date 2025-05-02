@@ -30,7 +30,7 @@ public class CheckInController {
 
         // increment people count
         Integer currentCount = studySpot.getCurrentCheckInCount();
-        studySpot.setCurrentCheckInCount(currentCount + 1);
+        studySpot.setCurrentCheckInCount((currentCount != null ? currentCount : 0) + 1);
         studySpotRepository.save(studySpot);
 
         return ResponseEntity.ok("User checked in successfully.");
@@ -41,6 +41,24 @@ public class CheckInController {
         StudySpot studySpot = studySpotRepository.findById(locationId)
             .orElseThrow(() -> new RuntimeException("StudySpot not found."));
         return ResponseEntity.ok(studySpot.getCurrentCheckInCount());
+    }
+
+    @PostMapping("/{locationId}/user/{userId}/checkout")
+    public ResponseEntity<?> checkOut(@PathVariable Long locationId, @PathVariable Integer userId) {
+        // TODO: Fix the checkout time handling logic; Ensure that only one active check-in exists for a user per location
+        CheckIn checkIn = checkInRepository.findActiveCheckIn(userId, locationId);
+        if (checkIn == null) {
+            return ResponseEntity.badRequest().body("No active check-in found.");
+        }
+        //delete checkout time
+        checkInRepository.delete(checkIn);
+
+        // decrease check-in count
+        StudySpot studySpot = checkIn.getStudySpot();
+        studySpot.setCurrentCheckInCount(studySpot.getCurrentCheckInCount() - 1);
+        studySpotRepository.save(studySpot);
+
+        return ResponseEntity.ok("User checked out successfully.");
     }
 }
 //

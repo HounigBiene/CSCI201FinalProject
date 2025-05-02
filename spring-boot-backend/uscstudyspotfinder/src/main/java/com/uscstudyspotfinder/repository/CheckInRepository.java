@@ -14,6 +14,9 @@ public interface CheckInRepository extends JpaRepository<CheckIn, CheckInId> {
 
     List<CheckIn> findByUserId(Integer userId);
 
-    @Query("SELECT COUNT(c) FROM CheckIn c WHERE c.studySpot.locationId = :locationId AND c.checkOutTime IS NULL")
-    Integer countCurrentCheckIns(@Param("locationId") Integer locationId);
+    @Query("SELECT COUNT(c) FROM CheckIn c WHERE c.studySpot.id = :locationId AND c.checkOutTime IS NULL")
+    Integer countCurrentCheckIns(@Param("locationId") Long locationId);
+
+    @Query("SELECT c FROM CheckIn c WHERE c.userId = :userId AND c.studySpot.id = :locationId AND c.checkOutTime IS NULL")
+    CheckIn findActiveCheckIn(@Param("userId") Integer userId, @Param("locationId") Long locationId);
 }
