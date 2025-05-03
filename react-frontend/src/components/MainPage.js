@@ -286,11 +286,13 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       updateMarker(selectedMarkerKey, spotName, description);
     } else if (clickPosition) {
       addMarker(clickPosition, spotName, description);
+      console.log(clickPosition[0]);
+      console.log(clickPosition[1]);
       const data = {
         name: spotName,
         description,
-        latitude: clickPosition.lat,
-        longitude: clickPosition.lng
+        latitude: clickPosition[0],
+        longitude: clickPosition[1]
       };
       const response = await fetch("http://localhost:8080/api/addspot",
         {

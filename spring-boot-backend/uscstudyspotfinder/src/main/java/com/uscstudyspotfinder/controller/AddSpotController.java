@@ -45,6 +45,8 @@ public class AddSpotController {
     {
 		
     GeometryFactory geometryFactory = new GeometryFactory();
+    System.out.println(spotrequest.getLongitude());
+    System.out.println(spotrequest.getLatitude());
     Point location = geometryFactory.createPoint(
         new Coordinate(spotrequest.getLongitude(), spotrequest.getLatitude())
     );

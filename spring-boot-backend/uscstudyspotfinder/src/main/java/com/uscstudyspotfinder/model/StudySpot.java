@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.GeometryFactory;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 @Entity
 @Table(name = "study_spot")
@@ -28,9 +30,11 @@ public class StudySpot {
     private Integer currentCheckInCount = 0;
 
     @Transient
+    @JsonProperty("latitude")
     private double latitude;
 
     @Transient
+    @JsonProperty("longitude")
     private double longitude;
 
     public StudySpot() {
@@ -42,6 +46,10 @@ public class StudySpot {
         this.currentCheckInCount = 0;
 
         GeometryFactory geometryFactory = new GeometryFactory();
+
+        System.out.println("in constructor");
+        System.out.println(longitude);
+        System.out.println(latitude);
         this.locationPin = geometryFactory.createPoint(new Coordinate(longitude, latitude)); 
     }
 
@@ -59,6 +67,7 @@ public class StudySpot {
     }
 
     public void setName(String name) {
+        System.out.println("Waaaaaaaghhh");
         this.name = name;
     }
 
@@ -86,13 +95,25 @@ public class StudySpot {
         this.currentCheckInCount = currentCheckInCount;
     }
 
-    @Transient
-    public double getLatitude() {
-        return locationPin != null ? locationPin.getY() : 0.0;
+    @JsonProperty("latitude")
+    public void setLatitude(double latitude) {
+        System.out.println("Lat: " + latitude);
+        this.latitude = latitude;
     }
 
-    @Transient
+    @JsonProperty("longitude")
+    public void setLongitude(double longitude) {
+        System.out.println("Lng: " + longitude);
+        this.longitude = longitude;
+    }
+
+    @JsonProperty("latitude")
+    public double getLatitude() {
+        return this.latitude;
+    }
+
+    @JsonProperty("longitude")
     public double getLongitude() {
-        return locationPin != null ? locationPin.getX() : 0.0;
+        return this.longitude;
     }
 }
