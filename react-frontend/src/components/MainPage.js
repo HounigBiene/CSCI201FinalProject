@@ -563,8 +563,6 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
   };
   return (
     <div style={{ position: "relative", width: "100%", height: "100vh" }}>
-      <Friend isOpen={friendOpen} toggleDashboard={toggleFriend} />
-
       {panelOpen && (
         <div
           style={{
