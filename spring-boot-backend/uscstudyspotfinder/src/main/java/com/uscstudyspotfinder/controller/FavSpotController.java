@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:3000")
 
 
 @RestController
@@ -37,6 +37,7 @@ public class FavSpotController {
     // Get all favorite spots for a user
     @GetMapping("/{userId}")
     public ResponseEntity<List<FavSpot>> getFavoritesByUser(@PathVariable Long userId) {
+        System.out.println("Getting favorite spots");
         List<FavSpot> favorites = favSpotRepository.findByUserId(userId);
         return ResponseEntity.ok(favorites);
     }
