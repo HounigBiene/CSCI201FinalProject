@@ -281,7 +281,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     setMarkers((current) => current.filter((marker) => marker.key !== key));
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!spotName.trim()) {
       return alert("Please enter a name for the spot.");
     }
