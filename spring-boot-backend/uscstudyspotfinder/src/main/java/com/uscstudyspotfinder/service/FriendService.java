@@ -120,5 +120,69 @@ public void declineFriendRequest(String senderUsername, String receiverUsername)
     friendRequest.setStatus(FriendList.FriendStatus.declined);
     friendListRepository.save(friendRequest);
 }
+    public List<Map<String, Object>> getPendingRequests(String username) {
+        User receiver = userRepository.findByUsername(username)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
+        List<FriendList> pendingRequests = friendListRepository.findByUserId2AndStatus(
+                receiver.getUserId(), FriendList.FriendStatus.pending);
+
+        List<Map<String, Object>> response = new ArrayList<>();
+
+        for (FriendList request : pendingRequests) {
+            User sender = userRepository.findById(request.getUserId1().longValue())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sender not found"));
+
+            Map<String, Object> requestData = new HashMap<>();
+            requestData.put("senderUsername", sender.getUsername());
+            requestData.put("senderUserId", sender.getUserId());
+            requestData.put("status", request.getStatus().toString());
+
+            response.add(requestData);
+        }
+
+        return response;
+    }
+    public List<Map<String, Object>> getFriendsList(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<FriendList> friendshipsInitiatedByUser = friendListRepository.findByUserId1AndStatus(
+                user.getUserId(), FriendList.FriendStatus.accepted);
+
+        List<FriendList> friendshipsReceivedByUser = friendListRepository.findByUserId2AndStatus(
+                user.getUserId(), FriendList.FriendStatus.accepted);
+
+        List<Map<String, Object>> friends = new ArrayList<>();
+
+        // Friends where current user is userId1
+        for (FriendList friendship : friendshipsInitiatedByUser) {
+            Integer friendId = friendship.getUserId2();
+            User friend = userRepository.findById(friendId.longValue())
+                    .orElseThrow(() -> new RuntimeException("Friend not found"));
+
+            Map<String, Object> friendData = new HashMap<>();
+            friendData.put("userId", friend.getUserId());
+            friendData.put("username", friend.getUsername());
+            friendData.put("email", friend.getEmail());
+
+            friends.add(friendData);
+        }
+
+        // Friends where current user is userId2
+        for (FriendList friendship : friendshipsReceivedByUser) {
+            Integer friendId = friendship.getUserId1();
+            User friend = userRepository.findById(friendId.longValue())
+                    .orElseThrow(() -> new RuntimeException("Friend not found"));
+
+            Map<String, Object> friendData = new HashMap<>();
+            friendData.put("userId", friend.getUserId());
+            friendData.put("username", friend.getUsername());
+            friendData.put("email", friend.getEmail());
+
+            friends.add(friendData);
+        }
+
+        return friends;
+    }
 }

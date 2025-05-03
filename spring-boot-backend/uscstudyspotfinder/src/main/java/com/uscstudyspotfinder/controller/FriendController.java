@@ -26,6 +26,7 @@ public class FriendController {
 
     @PostMapping("/accept")
     public ResponseEntity<?> acceptFriendRequest(@RequestBody FriendRequest request) {
+        System.out.println("Accepting friend request from " + request.getSenderUsername() + " to " + request.getReceiverUsername());
         friendService.acceptFriendRequest(request.getSenderUsername(), request.getReceiverUsername());
         return ResponseEntity.ok("Friend request accepted!");
     }
@@ -36,5 +37,13 @@ public class FriendController {
         return ResponseEntity.ok("Friend request declined!");
     }
 
+    @GetMapping("/requests/pending")
+    public ResponseEntity<?> getPendingRequests(@RequestParam String username) {
+        return ResponseEntity.ok(friendService.getPendingRequests(username));
+    }
 
+    @GetMapping("/list")
+    public ResponseEntity<?> getFriendsList(@RequestParam String username) {
+        return ResponseEntity.ok(friendService.getFriendsList(username));
+    }
 }

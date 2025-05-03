@@ -4,6 +4,8 @@ import "../css/Navbar.css"; // Assuming this holds relevant styles
 
 export const Friend = ({ isOpen, toggleDashboard }) => {
   const { isLoggedIn, currentUser } = useAuth(); // Get auth state
+  console.log("isLoggedIn:", isLoggedIn);
+  console.log("currentUser:", currentUser);
   const [friends, setFriends] = useState([]); // State for accepted friends
   const [pendingRequests, setPendingRequests] = useState([]); // State for pending requests
   const [isLoadingFriends, setIsLoadingFriends] = useState(false); // Keep for potential future use
@@ -30,7 +32,7 @@ export const Friend = ({ isOpen, toggleDashboard }) => {
   useEffect(() => {
     if (isOpen && isLoggedIn) {
       setError(''); // Clear previous errors
-
+/*
       // --- Dummy Data Section ---
       setIsLoadingFriends(false); // Simulate loading finished
       setIsLoadingRequests(false); // Simulate loading finished
@@ -47,11 +49,13 @@ export const Friend = ({ isOpen, toggleDashboard }) => {
         { userId: 202, username: 'TravelerHorse', email: 'traveler@usc.edu' },
         { userId: 203, username: 'GeorgeT', email: 'georget@usc.edu' },
       ]);
+      */
       // --- End Dummy Data Section ---
 
       // --- Commented out Fetch Logic ---
-      // fetchFriends();
-      // fetchPendingRequests();
+      console.log("Current user:", currentUser);
+      fetchFriends();
+      fetchPendingRequests();
       // --- End Commented out Fetch Logic ---
 
     } else {
@@ -62,11 +66,11 @@ export const Friend = ({ isOpen, toggleDashboard }) => {
   }, [isOpen, isLoggedIn]); // Rerun effect if panel opens/closes or login status changes
 
   // Commented out fetch functions
-  /*
+
   const fetchFriends = async () => {
     setIsLoadingFriends(true);
     try {
-      const response = await fetch('http://localhost:8080/api/friends/list', {
+      const response = await fetch(`http://localhost:8080/api/friends/list?username=${currentUser.username}`, {
         credentials: 'include',
       });
       if (!response.ok) {
@@ -85,14 +89,22 @@ export const Friend = ({ isOpen, toggleDashboard }) => {
   const fetchPendingRequests = async () => {
     setIsLoadingRequests(true);
     try {
-      const response = await fetch('http://localhost:8080/api/friends/requests/pending', {
+      const response = await fetch(`http://localhost:8080/api/friends/requests/pending?username=${currentUser.username}`, {
         credentials: 'include',
       });
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const data = await response.json();
-      setPendingRequests(data);
+
+      // Transform the backend response to include userId (needed for accept/decline)
+      const formattedData = data.map(req => ({
+        userId: req.senderUserId,         // <-- from backend: sender user ID
+        username: req.senderUsername,    // <-- from backend: sender username
+        status: req.status               // <-- from backend: request status (optional, but you’re already including it)
+      }));
+
+      setPendingRequests(formattedData);
     } catch (fetchError) {
       console.error("Failed to fetch pending requests:", fetchError);
       setError('Could not load pending requests.');
@@ -100,37 +112,35 @@ export const Friend = ({ isOpen, toggleDashboard }) => {
       setIsLoadingRequests(false);
     }
   };
-  */
+
 
   const handleAccept = async (senderId) => {
     setError('');
     try {
-      // --- Commented out Fetch Logic ---
-      /*
-      const response = await fetch(`http://localhost:8080/api/friends/request/${senderId}/accept`, {
+      const sender = pendingRequests.find(req => req.userId === senderId);
+      if (!sender) {
+        setError('Sender not found');
+        return;
+      }
+
+      const response = await fetch(`http://localhost:8080/api/friends/accept`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          senderUsername: sender.username,
+          receiverUsername: currentUser.username
+        }),
         credentials: 'include',
       });
+
       if (!response.ok) {
-         const errorText = await response.text();
-         throw new Error(errorText || `HTTP error! status: ${response.status}`);
+        const errorText = await response.text();
+        throw new Error(errorText || `HTTP error! status: ${response.status}`);
       }
-      */
-      console.log(`Simulating accept request from user ${senderId}`);
-      // --- End Commented out Fetch Logic ---
 
-      // Refresh lists after accepting (simulate locally)
-      const acceptedUser = pendingRequests.find(req => req.userId === senderId);
-      if (acceptedUser) {
-          setFriends(currentFriends => [...currentFriends, acceptedUser]);
-      }
-      setPendingRequests(currentRequests => currentRequests.filter(req => req.userId !== senderId));
-
-      // --- Commented out Fetch Logic ---
-      // fetchFriends();
-      // fetchPendingRequests();
-      // --- End Commented out Fetch Logic ---
-
+      // Refresh both lists from backend
+      await fetchFriends();
+      await fetchPendingRequests();
     } catch (actionError) {
       console.error("Failed to accept request:", actionError);
       setError(`Failed to accept request: ${actionError.message}`);
@@ -138,33 +148,36 @@ export const Friend = ({ isOpen, toggleDashboard }) => {
   };
 
   const handleDecline = async (senderId) => {
-     setError('');
+    setError('');
     try {
-      // --- Commented out Fetch Logic ---
-      /*
-      const response = await fetch(`http://localhost:8080/api/friends/request/${senderId}/decline`, {
-        method: 'POST', // Or DELETE if backend uses that
+      const sender = pendingRequests.find(req => req.userId === senderId);
+      if (!sender) {
+        setError('Sender not found');
+        return;
+      }
+
+      const response = await fetch(`http://localhost:8080/api/friends/decline`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          senderUsername: sender.senderUsername,  // fixed here
+          receiverUsername: currentUser.username
+        }),
         credentials: 'include',
       });
-       if (!response.ok) {
-         const errorText = await response.text();
-         throw new Error(errorText || `HTTP error! status: ${response.status}`);
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || `HTTP error! status: ${response.status}`);
       }
-      */
-      console.log(`Simulating decline request from user ${senderId}`);
-      // --- End Commented out Fetch Logic ---
 
-      // Refresh pending requests list after declining/removing (simulate locally)
       setPendingRequests(currentRequests => currentRequests.filter(req => req.userId !== senderId));
-
-      // --- Commented out Fetch Logic ---
-      // fetchPendingRequests();
-      // --- End Commented out Fetch Logic ---
     } catch (actionError) {
       console.error("Failed to decline request:", actionError);
-       setError(`Failed to decline request: ${actionError.message}`);
+      setError(`Failed to decline request: ${actionError.message}`);
     }
   };
+
 
   // Button styles for accept/decline
   const actionButtonStyle = {
