@@ -81,113 +81,7 @@ function LocationMarker({ setCenter }) {
   );
 }
 
-const EditableMarker = ({
-  marker,
-  onEditClick,
-  onDeleteClick,
-  upvoteMarker,
-  downvoteMarker,
-  toggleCheckIn,
-}) => (
-  <Marker position={marker.position} icon={blueIcon}>
-    <Popup closeButton={true} closeOnClick={false}>
-      <div>
-        <h4 style={{ margin: "0 0 5px" }}>{marker.name || "New Spot"}</h4>
-        <p style={{ minWidth: "200px" }}>
-          {marker.description || "No description provided"}
-        </p>
-        <p>
-          Location: {marker.position[0].toFixed(5)},{" "}
-          {marker.position[1].toFixed(5)}
-        </p>
-        <p>
-          Number of Current People: {marker.checkInCount || 0}
-        </p>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginTop: "8px",
-          }}
-        >
-          <button onClick={onEditClick}>Edit</button>
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              upvoteMarker(marker.key);
-            }}
-            style={{
-              backgroundColor: "#28a745",
-              color: "white",
-              border: "none",
-              padding: "5px 10px",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontSize: "10px",
-              verticalAlign: "center",
-            }}
-          >
-            ↑ <span>{marker.upvotes}</span>
-          </button>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              downvoteMarker(marker.key);
-            }}
-            style={{
-              backgroundColor: "#ffc107",
-              color: "black",
-              border: "none",
-              padding: "5px 10px",
-              borderRadius: "4px",
-              cursor: "pointer",
-              fontSize: "10px",
-              verticalAlign: "center",
-            }}
-          >
-            ↓ <span>{marker.downvotes}</span>
-          </button>
-          <button
-            onClick={onDeleteClick}
-            style={{
-              backgroundColor: "#dc3545",
-              color: "white",
-              border: "none",
-              padding: "5px 10px",
-              borderRadius: "4px",
-              cursor: "pointer",
-            }}
-          >
-            Delete
-          </button>
-        </div>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <button
-            style={{
-              backgroundColor: "#7481a8",
-              color: "white",
-              border: "none",
-              padding: "5px 10px",
-              borderRadius: "4px",
-              cursor: "pointer",
-              marginTop: "10px",
-            }}
-            onClick={() => toggleCheckIn(marker.key)}            
-          >
-            {marker.checkedIn ? "Check Out" : "Check In"}
-          </button>
-        </div>
-      </div>
-    </Popup>
-  </Marker>
-);
 
 const MainPage = ({ friendOpen, toggleFriend, userId }) => {
   const location = useLocation();
@@ -202,10 +96,19 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
   const [clickPosition, setClickPosition] = useState(null);
   const [selectedMarkerKey, setSelectedMarkerKey] = useState(null);
   const [userVotes, setUserVotes] = useState({});
-  const { currentUser } = useAuth();
+  const { isLoggedIn, currentUser } = useAuth();
+  const [prevFavorites, setFavoriteSpots] = useState([]);
+  //const [favorites, setFavorites] = useState([]);
 
   console.log(currentUser);
   console.log("dbSpots:", dbSpots);
+  useEffect(() => {
+    if (isLoggedIn && currentUser) {
+      fetchUserFavorites();
+    }
+  }, [isLoggedIn, currentUser]);
+
+
 
   useEffect(() => {
     const fetchStudySpots = async () => {
@@ -241,6 +144,170 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     setDashboardOpen(!dashboardOpen);
   };
 
+  const toggleFavorite = async (markerId, e) => {
+    // Prevent event propagation to avoid triggering map events
+    if (e) e.stopPropagation();
+    if (!isLoggedIn || !currentUser) {
+      alert("Please log in to save favorites");
+      return;
+    }
+
+    const isFavorite = prevFavorites.includes(markerId);
+    console.log(isFavorite);
+
+    try {
+      const { userId } = currentUser;
+      const requestOptions = {
+        method: isFavorite ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: userId,
+          spotId: markerId
+        })
+      };
+
+      const response = await fetch('http://localhost:8080/api/favorites', requestOptions);
+
+      if (response.ok) {
+
+      } else {
+        console.error("Failed to update favorite");
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
+
+    setFavoriteSpots(prevFavorites =>
+      prevFavorites.includes(markerId)
+        ? prevFavorites.filter(id => id !== markerId)
+        : [...prevFavorites, markerId]
+    );
+  };
+
+  const fetchUserFavorites = async () => {
+    const { userId } = currentUser;
+    try {
+      const response = await fetch(`http://localhost:8080/api/favorites/${userId}`);
+      if (response.ok) {
+        const favorites = await response.json();
+        setFavoriteSpots(favorites.map(fav => fav.spotId));
+      }
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+    }
+  };
+
+  const EditableMarker = ({
+    marker,
+    onEditClick,
+    onDeleteClick,
+    upvoteMarker,
+    downvoteMarker,
+    toggleCheckIn,
+  }) => (
+    <Marker position={marker.position} icon={blueIcon}>
+      <Popup closeButton={true} closeOnClick={false}>
+        <div>
+          <h4 style={{ margin: '0 0 5px' }}>
+              {marker.name || 'New Spot'}
+              <FavoriteStar markerId={marker.id || `marker-${marker.position.join('-')}`} />
+          </h4>
+          <p style={{ minWidth: "200px" }}>
+            {marker.description || "No description provided"}
+          </p>
+          <p>
+            Location: {marker.position[0].toFixed(5)},{" "}
+            {marker.position[1].toFixed(5)}
+          </p>
+          <p>
+            Number of Current People: {marker.checkInCount || 0}
+          </p>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: "8px",
+            }}
+          >
+            <button onClick={onEditClick}>Edit</button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                upvoteMarker(marker.key);
+              }}
+              style={{
+                backgroundColor: "#28a745",
+                color: "white",
+                border: "none",
+                padding: "5px 10px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "10px",
+                verticalAlign: "center",
+              }}
+            >
+              ↑ <span>{marker.upvotes}</span>
+            </button>
+
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                downvoteMarker(marker.key);
+              }}
+              style={{
+                backgroundColor: "#ffc107",
+                color: "black",
+                border: "none",
+                padding: "5px 10px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                fontSize: "10px",
+                verticalAlign: "center",
+              }}
+            >
+              ↓ <span>{marker.downvotes}</span>
+            </button>
+            <button
+              onClick={onDeleteClick}
+              style={{
+                backgroundColor: "#dc3545",
+                color: "white",
+                border: "none",
+                padding: "5px 10px",
+                borderRadius: "4px",
+                cursor: "pointer",
+              }}
+            >
+              Delete
+            </button>
+          </div>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <button
+              style={{
+                backgroundColor: "#7481a8",
+                color: "white",
+                border: "none",
+                padding: "5px 10px",
+                borderRadius: "4px",
+                cursor: "pointer",
+                marginTop: "10px",
+              }}
+              onClick={() => toggleCheckIn(marker.key)}
+            >
+              {marker.checkedIn ? "Check Out" : "Check In"}
+            </button>
+          </div>
+        </div>
+      </Popup>
+    </Marker>
+  );
+
   const addMarker = (position, name, description) => {
     setMarkers((current) => [
       ...current,
@@ -256,6 +323,32 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     ]);
   };
 
+  const FavoriteStar = ({ markerId }) => {
+    const isFavorite = prevFavorites.includes(markerId);
+    const [isHovered, setIsHovered] = useState(false);
+
+    return (
+      <span
+        className="favorite-star"
+        onClick={(e) => toggleFavorite(markerId, e)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        style={{
+          cursor: 'pointer',
+          color: isFavorite ? 'gold' : 'gray',
+          fontSize: '1.25rem',
+          marginLeft: '15px', // Add spacing between star and text
+          transform: isHovered ? 'scale(1.3)' : 'scale(1)',
+          transition: 'all 0.2s linear',
+          display: 'inline-block'
+        }}
+      >
+        ★
+      </span>
+    );
+  };
+
+
   const updateMarkerDescription = (key, newDescription) => {
     setMarkers((current) =>
       current.map((marker) =>
@@ -267,10 +360,10 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     setMarkers(current =>
       current.map(marker =>
         marker.key === key
-          ? { 
-              ...marker, 
-              name: newName, 
-              description: newDescription 
+          ? {
+              ...marker,
+              name: newName,
+              description: newDescription
             }
           : marker
       )
@@ -311,7 +404,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
-      })      
+      })
       .catch(error => {
         console.log("Error: ", error);
       });
@@ -657,11 +750,12 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
               icon={blueIcon}
             >
               <Popup>
-                <strong>{spot.name || "Study Spot"} (
+                <strong style={{margin : '0 0 5px'}}>{spot.name || "Study Spot"} (
                     <span style={{ color: spot.currentCheckInCount >= 5 ? 'red' : spot.currentCheckInCount >= 2 ? 'orange' : 'green' }}>
                       {spot.currentCheckInCount >= 5 ? 'Busy' : spot.currentCheckInCount >= 2 ? 'Moderate' : 'Empty'}
                     </span>
-                    )                        
+                    )
+                    <FavoriteStar markerId={spot.locationId || `spot-${spot.latitude}`} />
                     </strong>
                 <br />
                 {spot.description || "No description."}
