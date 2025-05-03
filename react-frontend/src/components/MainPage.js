@@ -179,7 +179,7 @@ const EditableMarker = ({
               cursor: "pointer",
               marginTop: "10px",
             }}
-            onClick={() => toggleCheckIn(marker.key)}
+            onClick={() => toggleCheckIn(marker.key)}            
           >
             {marker.checkedIn ? "Check Out" : "Check In"}
           </button>
@@ -289,6 +289,32 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       updateMarker(selectedMarkerKey, spotName, description);
     } else if (clickPosition) {
       addMarker(clickPosition, spotName, description);
+      console.log(clickPosition[0]);
+      console.log(clickPosition[1]);
+      const data = {
+        name: spotName,
+        description,
+        latitude: clickPosition[0],
+        longitude: clickPosition[1]
+      };
+      const response = await fetch("http://localhost:8080/api/addspot",
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type' : 'application/json'
+          },
+          body: JSON.stringify(data)
+        }
+      )
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })      
+      .catch(error => {
+        console.log("Error: ", error);
+      });
     }
     setSelectedMarkerKey(null);
     setClickPosition(null);
