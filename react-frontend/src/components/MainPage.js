@@ -422,7 +422,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       //unvote
       setDbSpots((prevSpots) =>
           prevSpots.map((spot) =>
-              spot.locationId === key
+              spot.key === key
                   ? {
                     ...spot,
                     upvotes: Math.max(0, (spot.upvotes || 0) - 1),
@@ -437,7 +437,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
         // If so, remove the downvote and update the state
         setDbSpots((prevSpots) =>
             prevSpots.map((spot) =>
-                spot.locationId === key
+                spot.key === key
                     ? { ...spot,
                       downvotes: Math.max(0, (spot.downvotes || 0) - 1),}
                     : spot
@@ -447,7 +447,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
 
       setDbSpots((prevSpots) =>
           prevSpots.map((spot) =>
-              spot.locationId === key
+              spot.key === key
                   ? { ...spot,
                     upvotes: (spot.upvotes || 0) + 1 }
                   : spot
@@ -462,7 +462,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     if (userVotes[key] === "downvote") {
       setDbSpots((prevSpots) =>
           prevSpots.map((spot) =>
-              spot.locationId === key
+              spot.key === key
                   ? { ...spot,
                     downvotes: Math.max(0, (spot.downvotes || 0) - 1),}
                   : spot
@@ -475,7 +475,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
         // If so, remove the downvote and update the state
         setDbSpots((prevSpots) =>
             prevSpots.map((spot) =>
-                spot.locationId === key
+                spot.key === key
                     ? { ...spot,
                       upvotes: Math.max(0, (spot.upvotes || 0) - 1),}
                     : spot
@@ -485,7 +485,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
 
       setDbSpots((prevSpots) =>
           prevSpots.map((spot) =>
-              spot.locationId === key
+              spot.key === key
                   ? { ...spot, downvotes: (spot.downvotes || 0) + 1 }
                   : spot
           )
@@ -671,14 +671,11 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
                 <p>
                   Number of Current People: {spot.currentCheckInCount || 0}
                 </p>
-                <p>
-                Number of Likes: {spot.upvotes || 0}
-                </p>
                 <div>
                   <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        upvoteDbSpot(spot.locationId);
+                        upvoteDbSpot(spot.key);
                       }}
                       style={{
                         backgroundColor: "#28a745",
@@ -698,7 +695,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
                   <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        downvoteDbSpot(spot.locationId);
+                        downvoteDbSpot(spot.key);
                       }}
                       style={{
                         backgroundColor: "#ffc107",
