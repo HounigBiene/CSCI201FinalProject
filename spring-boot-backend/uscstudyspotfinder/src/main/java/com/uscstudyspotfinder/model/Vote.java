@@ -5,10 +5,13 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "votes")
 public class Vote {
-
+    
     @EmbeddedId
     private VoteId id;
-
+    
+    @Column(name = "vote_type", nullable = false)
+    private String voteType; // "upvote" or "downvote"
+    
     public Vote() {
     }
 
@@ -24,6 +27,14 @@ public class Vote {
         this.id = id;
     }
 
+    public String getVoteType() {
+        return voteType;
+    }
+
+    public void setVoteType(String voteType) {
+        this.voteType = voteType;
+    }
+
     public Long getUserId() {
         return id.getUserId();
     }
@@ -37,6 +48,7 @@ public class Vote {
         return "Vote{" +
                 "userId=" + id.getUserId() +
                 ", spotId=" + id.getSpotId() +
+                ", voteType='" + voteType + '\'' +
                 '}';
     }
 }
