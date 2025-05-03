@@ -8,7 +8,6 @@ import {
 } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { Friend } from "./Friend";
 import { useAuth } from '../contexts/AuthContext';
 import { useLocation } from "react-router-dom";
 
@@ -189,7 +188,7 @@ const EditableMarker = ({
   </Marker>
 );
 
-const MainPage = ({ friendOpen, toggleFriend, userId }) => {
+const MainPage = ({ userId }) => {
   const location = useLocation();
   const isSpotsPage = location.pathname === '/spots';
   const [center, setCenter] = useState([34.02051, -118.28563]); // Centered on USC
@@ -563,7 +562,6 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
   };
   return (
     <div style={{ position: "relative", width: "100%", height: "100vh" }}>
-      <Friend isOpen={friendOpen} toggleDashboard={toggleFriend} />
 
       {panelOpen && (
         <div
