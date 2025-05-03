@@ -38,6 +38,7 @@ public class FavSpotController {
     // Get all favorite spots for a user
     @GetMapping("/{userId}")
     public ResponseEntity<List<FavSpot>> getFavoritesByUser(@PathVariable Long userId) {
+        System.out.println("Getting favorite spots");
         List<FavSpot> favorites = favSpotRepository.findByUserId(userId);
         return ResponseEntity.ok(favorites);
     }

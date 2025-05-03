@@ -1,9 +1,15 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import "../css/Navbar.css";
 
 export const MySpots = ({ isOpen, toggleDashboard }) => {
+
+    
     const { currentUser } = useAuth();
+
+    console.log("MySpots mounted", currentUser);
+
+    const [savedSpots, setSavedSpots] = useState([]);
     const dashboardStyle = {
         position: 'absolute',
         right: isOpen ? '0' : '-400px',
@@ -17,6 +23,31 @@ export const MySpots = ({ isOpen, toggleDashboard }) => {
         padding: '20px',
         boxSizing: 'border-box'
     };
+
+    const fetchSavedSpots = async() => {
+
+        console.log("Fetching favorites for user ID:", currentUser?.userId);
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/favorites/${currentUser.userId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const data = await response.json();
+            console.log("data: ", data);
+            setSavedSpots(data);
+        } catch (fetchError)
+        {
+            console.error("Failed to fetch saved spots:", fetchError);
+        }
+    };
+
+    useEffect(() => {
+        console.log("useEffect triggered:", { isOpen, currentUser });
+        if (isOpen && currentUser?.userId) {
+            fetchSavedSpots();
+        }
+    }, [isOpen, currentUser]);
 
     return (
         <div style={dashboardStyle} onClick={(e) => e.stopPropagation()}>
