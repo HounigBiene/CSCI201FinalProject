@@ -96,11 +96,19 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
   const [clickPosition, setClickPosition] = useState(null);
   const [selectedMarkerKey, setSelectedMarkerKey] = useState(null);
   const [userVotes, setUserVotes] = useState({});
-  const { currentUser } = useAuth();
-  const [favorites, setFavorites] = useState([]);
+  const { isLoggedIn, currentUser } = useAuth();
+  const [prevFavorites, setFavoriteSpots] = useState([]);
+  //const [favorites, setFavorites] = useState([]);
 
   console.log(currentUser);
   console.log("dbSpots:", dbSpots);
+  useEffect(() => {
+    if (isLoggedIn && currentUser) {
+      fetchUserFavorites();
+    }
+  }, [isLoggedIn, currentUser]);
+
+
 
   useEffect(() => {
     const fetchStudySpots = async () => {
@@ -136,15 +144,57 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     setDashboardOpen(!dashboardOpen);
   };
 
-  const toggleFavorite = (markerId, e) => {
+  const toggleFavorite = async (markerId, e) => {
     // Prevent event propagation to avoid triggering map events
     if (e) e.stopPropagation();
+    if (!isLoggedIn || !currentUser) {
+      alert("Please log in to save favorites");
+      return;
+    }
 
-    setFavorites(prevFavorites =>
+    const isFavorite = prevFavorites.includes(markerId);
+    console.log(isFavorite);
+
+    try {
+      const { userId } = currentUser;
+      const requestOptions = {
+        method: isFavorite ? 'DELETE' : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          userId: userId,
+          spotId: markerId
+        })
+      };
+
+      const response = await fetch('http://localhost:8080/api/favorites', requestOptions);
+
+      if (response.ok) {
+
+      } else {
+        console.error("Failed to update favorite");
+      }
+    } catch (error) {
+      console.error("Error toggling favorite:", error);
+    }
+
+    setFavoriteSpots(prevFavorites =>
       prevFavorites.includes(markerId)
         ? prevFavorites.filter(id => id !== markerId)
         : [...prevFavorites, markerId]
     );
+  };
+
+  const fetchUserFavorites = async () => {
+    const { userId } = currentUser;
+    try {
+      const response = await fetch(`http://localhost:8080/api/favorites/${userId}`);
+      if (response.ok) {
+        const favorites = await response.json();
+        setFavoriteSpots(favorites.map(fav => fav.spotId));
+      }
+    } catch (error) {
+      console.error("Error fetching favorites:", error);
+    }
   };
 
   const EditableMarker = ({
@@ -274,7 +324,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
   };
 
   const FavoriteStar = ({ markerId }) => {
-    const isFavorite = favorites.includes(markerId);
+    const isFavorite = prevFavorites.includes(markerId);
     const [isHovered, setIsHovered] = useState(false);
 
     return (
