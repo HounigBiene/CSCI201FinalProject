@@ -673,6 +673,9 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
                 <p>
                   Number of Current People: {spot.currentCheckInCount || 0}
                 </p>
+                <p>
+                Number of Likes: {spot.upvotes || 0}
+                </p>
                 <div>
                   <button
                       onClick={(e) => {
