@@ -28,8 +28,6 @@ export const Friend = ({ isOpen, toggleDashboard }) => {
     overflowY: 'auto' // Add scroll if content overflows
   };
 
-  const { userId, username } = currentUser;
-
   // Fetch friends and pending requests when the panel is opened and user is logged in
   useEffect(() => {
     if (isOpen && isLoggedIn) {
@@ -222,7 +220,7 @@ export const Friend = ({ isOpen, toggleDashboard }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          senderUsername: username,
+          senderUsername: currentUser.username,
           receiverUsername: receiverUsername
         })
       });

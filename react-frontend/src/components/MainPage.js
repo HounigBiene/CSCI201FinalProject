@@ -179,7 +179,7 @@ const EditableMarker = ({
               cursor: "pointer",
               marginTop: "10px",
             }}
-            onClick={() => toggleCheckIn(marker.key)}
+            onClick={() => toggleCheckIn(marker.key)}            
           >
             {marker.checkedIn ? "Check Out" : "Check In"}
           </button>
