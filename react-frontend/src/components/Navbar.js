@@ -3,7 +3,7 @@ import { useLocation, useNavigate, Link } from "react-router-dom";
 import { useAuth } from '../contexts/AuthContext'; // Adjust path if needed
 import "../css/Navbar.css";
 
-export const Navbar = ({ friendOpen, toggleFriend }) => {
+export const Navbar = ({ friendOpen, toggleFriend, spotsOpen, toggleSpots }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isLoggedIn, currentUser, logout } = useAuth();
@@ -43,7 +43,7 @@ export const Navbar = ({ friendOpen, toggleFriend }) => {
               </a>
               <a
                 className="navbar-link"
-                onClick={() => handlePlaceholderClick("myspots")}
+                onClick={toggleSpots}
               >
                 My Spots
               </a>
