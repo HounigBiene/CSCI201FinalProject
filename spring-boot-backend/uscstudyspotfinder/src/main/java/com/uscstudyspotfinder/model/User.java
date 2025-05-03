@@ -19,8 +19,8 @@ public class User {
     private String username;
     private String email;
 
-    @OneToMany
-    private List<User> friends = new ArrayList<>();
+    //@OneToMany
+    //private List<User> friends = new ArrayList<>();
 
     public User() {
     }
@@ -47,12 +47,15 @@ public class User {
         return this.email;
     }
 
-    public List<User> getFriends() {
-        return friends;
-    }
+//    public List<User> getFriends() {
+//        return friends;
+//    }
+//
+//    public void addFriend(User user) {
+//        this.friends.add(user);
+//    }
 
     public void addFriend(User user) {
-        this.friends.add(user);
     }
 
     public void setUsername(String username) {

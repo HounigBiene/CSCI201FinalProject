@@ -188,12 +188,81 @@ export const Friend = ({ isOpen, toggleDashboard }) => {
     marginLeft: '10px',
     padding: '0 5px'
   };
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const trimmedSearch = searchTerm.trim();
+    console.log("searching for " , trimmedSearch);
+    try{
+      const response = await fetch('/api/users/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: trimmedSearch })
+      });
+      const data = await response.json();
+      console.log("Results:", data);
+      if (data.length === 1) {
+        setSearchResults(data);
+        const receiverUsername = data[0].username;
+        console.log("Sending friend request to:", receiverUsername);
+        sendFriendRequest(receiverUsername);
+      }
+    }
+    catch (error){
+      console.error("could not search for ", error);
+    }
+  };
+  const sendFriendRequest = async (receiverUsername) => {
+    try {
+      const response = await fetch('/api/friends/request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          senderUsername: currentUser.username,
+          receiverUsername: receiverUsername
+        })
+      });
+      const data = await response.json();
+      console.log("Friend request response:", data);
+    } catch (error) {
+      console.error("Error sending friend request", error);
+    }
+  };
   return (
     <div style={dashboardStyle} onClick={(e) => e.stopPropagation()}>
       {isLoggedIn ? (
         <>
           {error && <p style={{ color: 'red' }}>{error}</p>}
+
+          <div
+            style={{
+              display: 'flex',
+              margin: '5px',
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+            <form onSubmit={handleSubmit}>
+              <><input
+                  type="text"
+                  id="friend-search"
+                  value={(searchTerm)}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search for friends"
+              />
+                <span
+                    style={{marginLeft: '8px'}}
+                >
+                  <button
+                      type="submit"
+                      className="submit-friend-search"
+                  >
+                    search
+                  </button>
+              </span></>
+            </form>
+          </div>
 
           {/* Friends List Section */}
           <h2>Friends</h2>
