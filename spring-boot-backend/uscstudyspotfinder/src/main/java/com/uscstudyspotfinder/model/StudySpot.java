@@ -1,7 +1,11 @@
 package com.uscstudyspotfinder.model;
 
 import jakarta.persistence.*;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.GeometryFactory;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 
 @Entity
 @Table(name = "study_spot")
@@ -25,15 +29,30 @@ public class StudySpot {
     @Column(name = "current_check_in_count", nullable = false)
     private Integer currentCheckInCount = 0;
 
+    @Transient
+    @JsonProperty("latitude")
+    private double latitude;
+
+    @Transient
+    @JsonProperty("longitude")
+    private double longitude;
+
     public StudySpot() {
     }
 
-    public StudySpot(String name, String description, Point locationPin) {
+    public StudySpot(String name, String description, double latitude, double longitude) {
         this.name = name;
         this.description = description;
-        this.locationPin = locationPin;
         this.currentCheckInCount = 0;
+
+        GeometryFactory geometryFactory = new GeometryFactory();
+
+        System.out.println("in constructor");
+        System.out.println(longitude);
+        System.out.println(latitude);
+        this.locationPin = geometryFactory.createPoint(new Coordinate(longitude, latitude)); 
     }
+
 
     public Long getLocationId() {
         return locationId;
@@ -48,6 +67,7 @@ public class StudySpot {
     }
 
     public void setName(String name) {
+        System.out.println("Waaaaaaaghhh");
         this.name = name;
     }
 
@@ -73,5 +93,27 @@ public class StudySpot {
 
     public void setCurrentCheckInCount(Integer currentCheckInCount) {
         this.currentCheckInCount = currentCheckInCount;
+    }
+
+    @JsonProperty("latitude")
+    public void setLatitude(double latitude) {
+        System.out.println("Lat: " + latitude);
+        this.latitude = latitude;
+    }
+
+    @JsonProperty("longitude")
+    public void setLongitude(double longitude) {
+        System.out.println("Lng: " + longitude);
+        this.longitude = longitude;
+    }
+
+    @JsonProperty("latitude")
+    public double getLatitude() {
+        return this.latitude;
+    }
+
+    @JsonProperty("longitude")
+    public double getLongitude() {
+        return this.longitude;
     }
 }

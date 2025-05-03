@@ -79,3 +79,25 @@ INSERT INTO `study_spot` (`name`, `description`, `location_pin`, `current_check_
 ('Engineering Quad', 'Sunny open-air seating with power outlets', ST_GeomFromText('POINT(-118.2895 34.0212)'), 1),
 ('Annenberg Cafe', 'Modern space with lots of plugs and good coffee', ST_GeomFromText('POINT(-118.2870 34.0210)'), 4),
 ('Doheny Library', 'Historic library with silent floors', ST_GeomFromText('POINT(-118.2847 34.0215)'), 2);
+
+INSERT INTO users (username, email, password) VALUES
+('TommyTrojan', 'tommy@usc.edu', '$2a$10$DPRckKwbolvXKcB.JT9hueNxWFziTkGjkbvMY14lRjMpkscpXnKCm'),  -- user_id = 1
+('Hecuba', 'hecuba@usc.edu', '$2a$10$DPRckKwbolvXKcB.JT9hueNxWFziTkGjkbvMY14lRjMpkscpXnKCm'),      -- user_id = 2
+('BruinBear', 'bruin@ucla.edu', '$2a$10$DPRckKwbolvXKcB.JT9hueNxWFziTkGjkbvMY14lRjMpkscpXnKCm'),   -- user_id = 3
+('TravelerHorse', 'traveler@usc.edu', '$2a$10$DPRckKwbolvXKcB.JT9hueNxWFziTkGjkbvMY14lRjMpkscpXnKCm'), -- user_id = 4
+('GeorgeT', 'georget@usc.edu', '$2a$10$DPRckKwbolvXKcB.JT9hueNxWFziTkGjkbvMY14lRjMpkscpXnKCm');    -- user_id = 5
+
+-- Hecuba → TommyTrojan
+INSERT INTO friends_list (user_id_1, user_id_2, status) VALUES (2, 1, 'pending');
+
+-- BruinBear → TommyTrojan
+INSERT INTO friends_list (user_id_1, user_id_2, status) VALUES (3, 1, 'pending');
+
+-- TravelerHorse → TommyTrojan
+INSERT INTO friends_list (user_id_1, user_id_2, status) VALUES (4, 1, 'pending');
+
+-- GeorgeT → TommyTrojan
+INSERT INTO friends_list (user_id_1, user_id_2, status) VALUES (5, 1, 'pending');
+
+
+

@@ -48,6 +48,18 @@
     font-size: 1rem;
 }
 
+#username-display {
+    color: #FFC72C;
+    text-transform: uppercase;
+    font-weight: 500;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    text-decoration: none;
+    padding: 0.5rem 0.75rem;
+    font-size: 1rem;
+}
+
 .navbar-link:hover {
     color: #FFC72C;
 }
