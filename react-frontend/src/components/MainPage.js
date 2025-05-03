@@ -311,10 +311,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
-      })
-      .then(responseData => {
-        responseData;
-      })
+      })      
       .catch(error => {
         console.log("Error: ", error);
       });
