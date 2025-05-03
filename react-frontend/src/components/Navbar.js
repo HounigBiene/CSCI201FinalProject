@@ -1,9 +1,9 @@
 import React from 'react';
-import { useLocation, useNavigate, Link } from "react-router-dom";
-import { useAuth } from '../contexts/AuthContext'; // Adjust path if needed
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import "../css/Navbar.css";
 
-export const Navbar = ({ friendOpen, toggleFriend }) => {
+export const Navbar = ({ friendOpen, toggleFriend, spotsOpen, toggleSpots }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const { isLoggedIn, currentUser, logout } = useAuth();
@@ -15,12 +15,6 @@ export const Navbar = ({ friendOpen, toggleFriend }) => {
     } catch (error) {
       console.error("Logout failed:", error);
     }
-  };
-
-  // Simplified handling - assumes My Spots/Account might be routes or sections later
-  const handlePlaceholderClick = (sectionId) => {
-    console.log(`Maps or scroll to: ${sectionId}`);
-    // Future logic: navigate to a route or scroll if on main page
   };
 
   console.log("Logged in user:", isLoggedIn);
@@ -43,7 +37,7 @@ export const Navbar = ({ friendOpen, toggleFriend }) => {
               </a>
               <a
                 className="navbar-link"
-                onClick={() => handlePlaceholderClick("myspots")}
+                onClick={toggleSpots}
               >
                 My Spots
               </a>
