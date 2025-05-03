@@ -281,7 +281,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     setMarkers((current) => current.filter((marker) => marker.key !== key));
   };
 
-  const handleSave = async () => {
+  const handleSave = () => {
     if (!spotName.trim()) {
       return alert("Please enter a name for the spot.");
     }
@@ -289,35 +289,6 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       updateMarker(selectedMarkerKey, spotName, description);
     } else if (clickPosition) {
       addMarker(clickPosition, spotName, description);
-      console.log(clickPosition[0]);
-      console.log(clickPosition[1]);
-      const data = {
-        name: spotName,
-        description,
-        latitude: clickPosition[0],
-        longitude: clickPosition[1]
-      };
-      const response = await fetch("http://localhost:8080/api/addspot",
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type' : 'application/json'
-          },
-          body: JSON.stringify(data)
-        }
-      )
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .then(responseData => {
-        responseData;
-      })
-      .catch(error => {
-        console.log("Error: ", error);
-      });
     }
     setSelectedMarkerKey(null);
     setClickPosition(null);
@@ -425,7 +396,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       //unvote
       setDbSpots((prevSpots) =>
           prevSpots.map((spot) =>
-              spot.key === key
+              spot.locationId === key
                   ? {
                     ...spot,
                     upvotes: Math.max(0, (spot.upvotes || 0) - 1),
@@ -440,7 +411,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
         // If so, remove the downvote and update the state
         setDbSpots((prevSpots) =>
             prevSpots.map((spot) =>
-                spot.key === key
+                spot.locationId === key
                     ? { ...spot,
                       downvotes: Math.max(0, (spot.downvotes || 0) - 1),}
                     : spot
@@ -450,7 +421,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
 
       setDbSpots((prevSpots) =>
           prevSpots.map((spot) =>
-              spot.key === key
+              spot.locationId === key
                   ? { ...spot,
                     upvotes: (spot.upvotes || 0) + 1 }
                   : spot
@@ -465,7 +436,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     if (userVotes[key] === "downvote") {
       setDbSpots((prevSpots) =>
           prevSpots.map((spot) =>
-              spot.key === key
+              spot.locationId === key
                   ? { ...spot,
                     downvotes: Math.max(0, (spot.downvotes || 0) - 1),}
                   : spot
@@ -478,7 +449,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
         // If so, remove the downvote and update the state
         setDbSpots((prevSpots) =>
             prevSpots.map((spot) =>
-                spot.key === key
+                spot.locationId === key
                     ? { ...spot,
                       upvotes: Math.max(0, (spot.upvotes || 0) - 1),}
                     : spot
@@ -488,7 +459,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
 
       setDbSpots((prevSpots) =>
           prevSpots.map((spot) =>
-              spot.key === key
+              spot.locationId === key
                   ? { ...spot, downvotes: (spot.downvotes || 0) + 1 }
                   : spot
           )
@@ -680,7 +651,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
                   <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        upvoteDbSpot(spot.key);
+                        upvoteDbSpot(spot.locationId);
                       }}
                       style={{
                         backgroundColor: "#28a745",
@@ -700,7 +671,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
                   <button
                       onClick={(e) => {
                         e.stopPropagation();
-                        downvoteDbSpot(spot.key);
+                        downvoteDbSpot(spot.locationId);
                       }}
                       style={{
                         backgroundColor: "#ffc107",
