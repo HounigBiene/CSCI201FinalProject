@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.Optional;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/users")
@@ -37,9 +38,10 @@ public class UserController {
     @PostMapping("/search")
     public ResponseEntity<List<User>> searchUsersByEmail(@RequestBody Map<String, String> request) {
         String email = request.get("email");
+        System.out.println("Searching for email: " + email);
         List<User> matches = userRepository.findUsersByEmail(email);
         if (matches.isEmpty()) {
-            return ResponseEntity.status(404).body(null);
+            return ResponseEntity.ok(new ArrayList<>());
         }
 
         return ResponseEntity.ok(matches);

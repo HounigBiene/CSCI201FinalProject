@@ -13,6 +13,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
 
     // find friends by email
-    @Query("SELECT u FROM User u WHERE u.email LIKE %:email%")
+    @Query("SELECT u FROM User u WHERE u.email LIKE :email")
     List<User> findUsersByEmail(@Param("email") String email);
 }
