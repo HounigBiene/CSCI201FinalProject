@@ -205,12 +205,12 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     downvoteMarker,
     toggleCheckIn,
   }) => (
-    <Marker position={marker.position} icon={blueIcon}>
+    <Marker position={marker.position} icon={redIcon}>
       <Popup closeButton={true} closeOnClick={false}>
         <div>
           <h4 style={{ margin: '0 0 5px' }}>
-              {marker.name || 'New Spot'}
-              <FavoriteStar markerId={marker.id || `marker-${marker.position.join('-')}`} />
+            {marker.name || 'New Spot'}
+            <FavoriteStar markerId={marker.id || `marker-${marker.position.join('-')}`} />
           </h4>
           <p style={{ minWidth: "200px" }}>
             {marker.description || "No description provided"}
@@ -361,10 +361,10 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       current.map(marker =>
         marker.key === key
           ? {
-              ...marker,
-              name: newName,
-              description: newDescription
-            }
+            ...marker,
+            name: newName,
+            description: newDescription
+          }
           : marker
       )
     );
@@ -394,20 +394,20 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
         {
           method: 'POST',
           headers: {
-            'Content-Type' : 'application/json'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(data)
         }
       )
-      .then(response => {
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        return response.json();
-      })
-      .catch(error => {
-        console.log("Error: ", error);
-      });
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .catch(error => {
+          console.log("Error: ", error);
+        });
     }
     setSelectedMarkerKey(null);
     setClickPosition(null);
@@ -498,12 +498,12 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       current.map((marker) =>
         marker.key === key
           ? {
-              ...marker,
-              checkedIn: !marker.checkedIn,
-              checkInCount: marker.checkedIn
-                  ? Math.max(0, marker.checkInCount - 1)
-                  : (marker.checkInCount || 0) + 1,
-            }
+            ...marker,
+            checkedIn: !marker.checkedIn,
+            checkInCount: marker.checkedIn
+              ? Math.max(0, marker.checkInCount - 1)
+              : (marker.checkInCount || 0) + 1,
+          }
           : marker
       )
     );
@@ -514,14 +514,14 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     if (userVotes[key] === "upvote") {
       //unvote
       setDbSpots((prevSpots) =>
-          prevSpots.map((spot) =>
-              spot.key === key
-                  ? {
-                    ...spot,
-                    upvotes: Math.max(0, (spot.upvotes || 0) - 1),
-                    }
-                  : spot
-          )
+        prevSpots.map((spot) =>
+          spot.key === key
+            ? {
+              ...spot,
+              upvotes: Math.max(0, (spot.upvotes || 0) - 1),
+            }
+            : spot
+        )
       );
       setUserVotes((prev) => ({ ...prev, [key]: null }));
     } else {
@@ -529,22 +529,26 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       if (userVotes[key] === "downvote") {
         // If so, remove the downvote and update the state
         setDbSpots((prevSpots) =>
-            prevSpots.map((spot) =>
-                spot.key === key
-                    ? { ...spot,
-                      downvotes: Math.max(0, (spot.downvotes || 0) - 1),}
-                    : spot
-            )
+          prevSpots.map((spot) =>
+            spot.key === key
+              ? {
+                ...spot,
+                downvotes: Math.max(0, (spot.downvotes || 0) - 1),
+              }
+              : spot
+          )
         );
       }
 
       setDbSpots((prevSpots) =>
-          prevSpots.map((spot) =>
-              spot.key === key
-                  ? { ...spot,
-                    upvotes: (spot.upvotes || 0) + 1 }
-                  : spot
-          )
+        prevSpots.map((spot) =>
+          spot.key === key
+            ? {
+              ...spot,
+              upvotes: (spot.upvotes || 0) + 1
+            }
+            : spot
+        )
       );
       setUserVotes((prev) => ({ ...prev, [key]: "upvote" }));
       // TODO: Connect to database to update upvotes in the backend
@@ -554,12 +558,14 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
   const downvoteDbSpot = (key) => {
     if (userVotes[key] === "downvote") {
       setDbSpots((prevSpots) =>
-          prevSpots.map((spot) =>
-              spot.key === key
-                  ? { ...spot,
-                    downvotes: Math.max(0, (spot.downvotes || 0) - 1),}
-                  : spot
-          )
+        prevSpots.map((spot) =>
+          spot.key === key
+            ? {
+              ...spot,
+              downvotes: Math.max(0, (spot.downvotes || 0) - 1),
+            }
+            : spot
+        )
       );
       setUserVotes((prev) => ({ ...prev, [key]: null }));
     } else {
@@ -567,21 +573,23 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       if (userVotes[key] === "upvote") {
         // If so, remove the downvote and update the state
         setDbSpots((prevSpots) =>
-            prevSpots.map((spot) =>
-                spot.key === key
-                    ? { ...spot,
-                      upvotes: Math.max(0, (spot.upvotes || 0) - 1),}
-                    : spot
-            )
+          prevSpots.map((spot) =>
+            spot.key === key
+              ? {
+                ...spot,
+                upvotes: Math.max(0, (spot.upvotes || 0) - 1),
+              }
+              : spot
+          )
         );
       }
 
       setDbSpots((prevSpots) =>
-          prevSpots.map((spot) =>
-              spot.key === key
-                  ? { ...spot, downvotes: (spot.downvotes || 0) + 1 }
-                  : spot
-          )
+        prevSpots.map((spot) =>
+          spot.key === key
+            ? { ...spot, downvotes: (spot.downvotes || 0) + 1 }
+            : spot
+        )
       );
       setUserVotes((prev) => ({ ...prev, [key]: "downvote" }));
       // TODO: Connect to database to update downvotes in the backend
@@ -606,15 +614,15 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
 
       // Toggle check-in status for the marker
       setDbSpots((prevSpots) =>
-          prevSpots.map((spot) =>
-            spot.locationId === locationId
-                ? {
-                  ...spot,
-                  checkedIn: true,  // Check-in status
-                  currentCheckInCount: spot.currentCheckInCount + 1,  // Increment on check-in
-                }
-                : spot
-          )
+        prevSpots.map((spot) =>
+          spot.locationId === locationId
+            ? {
+              ...spot,
+              checkedIn: true,  // Check-in status
+              currentCheckInCount: spot.currentCheckInCount + 1,  // Increment on check-in
+            }
+            : spot
+        )
       );
     } catch (error) {
       console.error('Error during check-in:', error);
@@ -640,15 +648,15 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
 
       // Toggle check-out status for the marker
       setDbSpots((prevSpots) =>
-          prevSpots.map((spot) =>
-              spot.locationId === locationId
-                  ? {
-                    ...spot,
-                    checkedIn: false,  // Set as not checked in
-                    currentCheckInCount: spot.currentCheckInCount - 1,  // Decrement on checkout
-                  }
-                  : spot
-          )
+        prevSpots.map((spot) =>
+          spot.locationId === locationId
+            ? {
+              ...spot,
+              checkedIn: false,  // Set as not checked in
+              currentCheckInCount: spot.currentCheckInCount - 1,  // Decrement on checkout
+            }
+            : spot
+        )
       );
     } catch (error) {
       console.error('Error during checkout:', error);
@@ -720,6 +728,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       >
         <MapContainer
           center={center}
+          zoomControl={false}
           zoom={16}
           style={{ height: "100%", width: "100%" }}
         >
@@ -738,7 +747,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
           <LocationMarker setCenter={setCenter} />
 
           {clickPosition && !selectedMarkerKey && (
-            <Marker position={clickPosition} icon={blueIcon}>
+            <Marker position={clickPosition} icon={redIcon}>
               <Popup>New Spot Location</Popup>
             </Marker>
           )}
@@ -750,13 +759,13 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
               icon={blueIcon}
             >
               <Popup>
-                <strong style={{margin : '0 0 5px'}}>{spot.name || "Study Spot"} (
-                    <span style={{ color: spot.currentCheckInCount >= 5 ? 'red' : spot.currentCheckInCount >= 2 ? 'orange' : 'green' }}>
-                      {spot.currentCheckInCount >= 5 ? 'Busy' : spot.currentCheckInCount >= 2 ? 'Moderate' : 'Empty'}
-                    </span>
-                    )
-                    <FavoriteStar markerId={spot.locationId || `spot-${spot.latitude}`} />
-                    </strong>
+                <strong style={{ margin: '0 0 5px' }}>{spot.name || "Study Spot"} (
+                  <span style={{ color: spot.currentCheckInCount >= 5 ? 'red' : spot.currentCheckInCount >= 2 ? 'orange' : 'green' }}>
+                    {spot.currentCheckInCount >= 5 ? 'Busy' : spot.currentCheckInCount >= 2 ? 'Moderate' : 'Empty'}
+                  </span>
+                  )
+                  <FavoriteStar markerId={spot.locationId || `spot-${spot.latitude}`} />
+                </strong>
                 <br />
                 {spot.description || "No description."}
                 <br />
@@ -767,55 +776,55 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
                 </p>
                 <div>
                   <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        upvoteDbSpot(spot.key);
-                      }}
-                      style={{
-                        backgroundColor: "#28a745",
-                        color: "white",
-                        border: "none",
-                        padding: "5px 10px",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                        fontSize: "10px",
-                        verticalAlign: "center",
-                        margin: "5px"
-                      }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      upvoteDbSpot(spot.key);
+                    }}
+                    style={{
+                      backgroundColor: "#28a745",
+                      color: "white",
+                      border: "none",
+                      padding: "5px 10px",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                      fontSize: "10px",
+                      verticalAlign: "center",
+                      margin: "5px"
+                    }}
                   >
                     ↑ <span>{spot.upvotes}</span>
                   </button>
 
                   <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        downvoteDbSpot(spot.key);
-                      }}
-                      style={{
-                        backgroundColor: "#ffc107",
-                        color: "black",
-                        border: "none",
-                        padding: "5px 10px",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                        fontSize: "10px",
-                        verticalAlign: "center",
-                        margin: "5px"
-                      }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      downvoteDbSpot(spot.key);
+                    }}
+                    style={{
+                      backgroundColor: "#ffc107",
+                      color: "black",
+                      border: "none",
+                      padding: "5px 10px",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                      fontSize: "10px",
+                      verticalAlign: "center",
+                      margin: "5px"
+                    }}
                   >
                     ↓ <span>{spot.downvotes}</span>
                   </button>
                   <button
-                      style={{
-                        backgroundColor: "#7481a8",
-                        color: "white",
-                        border: "none",
-                        padding: "5px 10px",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                        margin: "5px"
-                      }}
-                      onClick={() => spot.checkedIn ? toggleDbSpotCheckOut(spot.locationId) : toggleDbSpotCheckIn(spot.locationId)}
+                    style={{
+                      backgroundColor: "#7481a8",
+                      color: "white",
+                      border: "none",
+                      padding: "5px 10px",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                      margin: "5px"
+                    }}
+                    onClick={() => spot.checkedIn ? toggleDbSpotCheckOut(spot.locationId) : toggleDbSpotCheckIn(spot.locationId)}
                   >
                     {spot.checkedIn ? "Check Out" : "Check In"}
                   </button>
