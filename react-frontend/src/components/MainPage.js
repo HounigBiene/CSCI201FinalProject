@@ -441,20 +441,20 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     }
   };
 
-  const deleteMarker = async (key) => {
+  const deleteMarker = async (spotId) => {
     try {
-      const response = await fetch(`http://localhost:8080/api/studyspots/${key}`, {
-        method: 'DELETE'
+      const response = await fetch(`http://localhost:8080/api/addspot/${spotId}`, {
+        method: 'DELETE',
       });
 
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        throw new Error('Failed to delete spot');
       }
 
-      setDbSpots(prev => prev.filter(spot => spot.locationId !== key));
+      setDbSpots(prevSpots => prevSpots.filter(spot => spot.locationId !== spotId));
     } catch (error) {
-      console.error("Error deleting spot:", error);
-      alert("Failed to delete spot. Please try again.");
+      console.error('Error deleting spot:', error);
+      alert('Failed to delete spot. Please try again.');
     }
   };
 

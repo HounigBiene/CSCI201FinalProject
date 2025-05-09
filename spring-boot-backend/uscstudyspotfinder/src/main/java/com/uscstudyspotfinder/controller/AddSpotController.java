@@ -43,4 +43,17 @@ public class AddSpotController {
         
         return ResponseEntity.ok(response);
     }
+
+    @DeleteMapping("/{spotId}")
+    public ResponseEntity<String> deleteSpot(@PathVariable Long spotId) {
+        try {
+            if (!spotRepository.existsById(spotId)) {
+                return ResponseEntity.notFound().build();
+            }
+            spotRepository.deleteById(spotId);
+            return ResponseEntity.ok("Spot deleted successfully");
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error deleting spot: " + e.getMessage());
+        }
+    }
 }
