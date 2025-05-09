@@ -100,5 +100,6 @@ INSERT INTO friends_list (user_id_1, user_id_2, status) VALUES (4, 1, 'pending')
 -- GeorgeT → TommyTrojan
 INSERT INTO friends_list (user_id_1, user_id_2, status) VALUES (5, 1, 'pending');
 
-
-
+INSERT INTO `votes` (`user_id`, `location_id`, `vote_type`) VALUES
+(1, 1, 'upvote'), (1, 3, 'upvote'), (2, 2, 'upvote'), (3, 1, 'upvote'),
+(4, 4, 'upvote'), (4, 1, 'downvote'), (5, 5, 'upvote'), (5, 3, 'downvote');

@@ -98,6 +98,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
   const [prevFavorites, setFavoriteSpots] = useState([]);
   const [popupData, setPopupData] = useState({});
   const [dbSpotsData, setDbSpotsData] = useState({});
+  const [friendVotes, setFriendVotes] = useState({});
 
   console.log(currentUser);
   console.log("dbSpots:", dbSpots);
@@ -107,65 +108,97 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     }
   }, [isLoggedIn, currentUser]);
 
-  useEffect(() => {
-    const fetchStudySpots = async () => {
-      try {
-        const response = await fetch("http://localhost:8080/api/studyspots");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+  const fetchAllData = async () => {
+    try {
+      // Fetch all study spots
+      const spotsResponse = await fetch("http://localhost:8080/api/studyspots");
+      if (!spotsResponse.ok) {
+        throw new Error(`HTTP error! status: ${spotsResponse.status}`);
+      }
+      const spotsData = await spotsResponse.json();
 
-        const spotsWithVotes = await Promise.all(data.map(async (spot) => {
-          const [upvotesResponse, downvotesResponse] = await Promise.all([
-            fetch(`http://localhost:8080/api/vote/upvotes/${spot.locationId}`),
-            fetch(`http://localhost:8080/api/vote/downvotes/${spot.locationId}`)
-          ]);
+      // Fetch friend votes if user is logged in
+      if (isLoggedIn && currentUser) {
+        try {
+          const response = await fetch(`http://localhost:8080/api/friends/list?username=${currentUser.username}`);
+          if (response.ok) {
+            const friends = await response.json();
+            const friendVotesPromises = friends.map(async (friend) => {
+              const voteResponse = await fetch(`http://localhost:8080/api/vote/user/${friend.userId}`);
+              if (!voteResponse.ok) return [];
+              const votes = await voteResponse.json();
+              return votes.filter(vote => vote.voteType === 'upvote').map(vote => vote.spotId);
+            });
 
-          let userVoteType = null;
-          if (isLoggedIn && currentUser && currentUser.userId) {
-            try {
-              const userVoteResponse = await fetch(`http://localhost:8080/api/vote/user/${currentUser.userId}/spot/${spot.locationId}`);
-              if (userVoteResponse.ok) {
-                const voteData = await userVoteResponse.json();
-                userVoteType = voteData.voteType || null;
-              }
-            } catch (error) {
-              console.error("Error fetching user vote:", error);
-            }
+            const allFriendVotes = await Promise.all(friendVotesPromises);
+            const friendVotesMap = allFriendVotes.flat().reduce((acc, spotId) => {
+              acc[spotId] = true;
+              return acc;
+            }, {});
+
+            setFriendVotes(friendVotesMap);
           }
-
-          const upvotesData = await upvotesResponse.json();
-          const downvotesData = await downvotesResponse.json();
-
-          return {
-            ...spot,
-            upvotes: typeof upvotesData === 'number' ? upvotesData : 0,
-            downvotes: typeof downvotesData === 'number' ? downvotesData : 0,
-            userVoteType: userVoteType
-          };
-        }));
-
-        setDbSpots(spotsWithVotes);
-      } catch (error) {
-        console.error("Failed to fetch study spots:", error);
+        } catch (error) {
+          console.error('Error fetching friend votes:', error);
+        }
       }
-    };
 
-    fetchStudySpots();
-  }, [isLoggedIn, currentUser]);
-  useEffect(() => {
-    if (selectedMarkerKey) {
-      const spotToEdit = dbSpots.find(s => s.key === selectedMarkerKey);
-      if (spotToEdit) {
-        setSpotName(spotToEdit.name);
-        setDescription(spotToEdit.description);
-      }
-    } else {
-      setSpotName("");
-      setDescription("");
+      // Fetch detailed data for each spot
+      const spotsWithVotes = await Promise.all(spotsData.map(async (spot) => {
+        const [upvotesResponse, downvotesResponse, userVoteResponse, checkInResponse] = await Promise.all([
+          fetch(`http://localhost:8080/api/vote/upvotes/${spot.locationId}`),
+          fetch(`http://localhost:8080/api/vote/downvotes/${spot.locationId}`),
+          fetch(`http://localhost:8080/api/vote/user/${currentUser?.userId}/spot/${spot.locationId}`),
+          fetch(`http://localhost:8080/api/checkin/${spot.locationId}/total`)
+        ]);
+
+        const upvotesData = await upvotesResponse.json();
+        const downvotesData = await downvotesResponse.json();
+        const voteData = await userVoteResponse.json();
+        const checkInData = await checkInResponse.json();
+
+        return {
+          ...spot,
+          upvotes: typeof upvotesData === 'number' ? upvotesData : 0,
+          downvotes: typeof downvotesData === 'number' ? downvotesData : 0,
+          userVoteType: voteData.voteType || null,
+          currentCheckInCount: checkInData || 0
+        };
+      }));
+
+      setDbSpots(spotsWithVotes);
+
+      // Update dbSpotsData with the latest information
+      const newDbSpotsData = spotsWithVotes.reduce((acc, spot) => {
+        acc[spot.locationId] = {
+          upvotes: spot.upvotes,
+          downvotes: spot.downvotes,
+          userVoteType: spot.userVoteType,
+          currentCheckInCount: spot.currentCheckInCount
+        };
+        return acc;
+      }, {});
+
+      setDbSpotsData(newDbSpotsData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
-  }, [selectedMarkerKey, dbSpots]);
+  };
+
+  useEffect(() => {
+    fetchAllData();
+    const intervalId = setInterval(fetchAllData, 3000);
+    return () => clearInterval(intervalId);
+  }, [isLoggedIn, currentUser]);
+
+  const getMarkerIcon = (spot) => {
+    if (!isLoggedIn) return blueIcon;
+
+    const isUpvotedByUser = dbSpotsData[spot.locationId]?.userVoteType === 'upvote';
+    const isUpvotedByFriend = friendVotes[spot.locationId];
+
+    return (isUpvotedByUser || isUpvotedByFriend) ? redIcon : blueIcon;
+  };
 
   const toggleDashboard = (e) => {
     if (e) e.stopPropagation();
@@ -593,8 +626,20 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       const downvotesData = await downvotesResponse.json();
       const voteData = await userVoteResponse.json();
 
-      setDbSpots((prevSpots) =>
-        prevSpots.map((spot) =>
+      // Immediately update the spot data
+      setDbSpotsData(prevData => ({
+        ...prevData,
+        [key]: {
+          ...prevData[key],
+          upvotes: typeof upvotesData === 'number' ? upvotesData : 0,
+          downvotes: typeof downvotesData === 'number' ? downvotesData : 0,
+          userVoteType: voteData.voteType || null
+        }
+      }));
+
+      // Also update the spots array to maintain consistency
+      setDbSpots(prevSpots =>
+        prevSpots.map(spot =>
           spot.locationId === key
             ? {
               ...spot,
@@ -643,8 +688,20 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       const downvotesData = await downvotesResponse.json();
       const voteData = await userVoteResponse.json();
 
-      setDbSpots((prevSpots) =>
-        prevSpots.map((spot) =>
+      // Immediately update the spot data
+      setDbSpotsData(prevData => ({
+        ...prevData,
+        [key]: {
+          ...prevData[key],
+          upvotes: typeof upvotesData === 'number' ? upvotesData : 0,
+          downvotes: typeof downvotesData === 'number' ? downvotesData : 0,
+          userVoteType: voteData.voteType || null
+        }
+      }));
+
+      // Also update the spots array to maintain consistency
+      setDbSpots(prevSpots =>
+        prevSpots.map(spot =>
           spot.locationId === key
             ? {
               ...spot,
@@ -727,49 +784,6 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       console.error('Error during checkout:', error);
     }
   };
-
-  const fetchAllSpotsData = async () => {
-    try {
-      const spotsData = await Promise.all(dbSpots.map(async (spot) => {
-        const [upvotesResponse, downvotesResponse, userVoteResponse, checkInResponse] = await Promise.all([
-          fetch(`http://localhost:8080/api/vote/upvotes/${spot.locationId}`),
-          fetch(`http://localhost:8080/api/vote/downvotes/${spot.locationId}`),
-          fetch(`http://localhost:8080/api/vote/user/${currentUser?.userId}/spot/${spot.locationId}`),
-          fetch(`http://localhost:8080/api/checkin/${spot.locationId}/total`)
-        ]);
-
-        const upvotesData = await upvotesResponse.json();
-        const downvotesData = await downvotesResponse.json();
-        const voteData = await userVoteResponse.json();
-        const checkInData = await checkInResponse.json();
-
-        return {
-          spotId: spot.locationId,
-          data: {
-            upvotes: typeof upvotesData === 'number' ? upvotesData : 0,
-            downvotes: typeof downvotesData === 'number' ? downvotesData : 0,
-            userVoteType: voteData.voteType || null,
-            currentCheckInCount: checkInData || 0
-          }
-        };
-      }));
-
-      const newDbSpotsData = spotsData.reduce((acc, { spotId, data }) => {
-        acc[spotId] = data;
-        return acc;
-      }, {});
-
-      setDbSpotsData(newDbSpotsData);
-    } catch (error) {
-      console.error("Error fetching spots data:", error);
-    }
-  };
-
-  useEffect(() => {
-    fetchAllSpotsData();
-    const intervalId = setInterval(fetchAllSpotsData, 3000);
-    return () => clearInterval(intervalId);
-  }, [dbSpots, currentUser]);
 
   return (
     <div style={{ position: "relative", width: "100%", height: "100vh" }}>
@@ -865,7 +879,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
             <Marker
               key={`db-${spot.locationId}`}
               position={[spot.latitude, spot.longitude]}
-              icon={blueIcon}
+              icon={getMarkerIcon(spot)}
             >
               <Popup>
                 <strong style={{ margin: '0 0 5px' }}>{spot.name || "Study Spot"} (
