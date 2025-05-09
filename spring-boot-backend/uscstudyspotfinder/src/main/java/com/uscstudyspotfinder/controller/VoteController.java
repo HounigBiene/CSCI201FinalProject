@@ -6,7 +6,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.HttpStatus;
 import com.uscstudyspotfinder.repository.UserRepository;
 import com.uscstudyspotfinder.repository.StudySpotRepository;
-
 import com.uscstudyspotfinder.repository.VoteRepository;
 import com.uscstudyspotfinder.model.Vote;
 import com.uscstudyspotfinder.model.VoteId;
@@ -45,20 +44,16 @@ public class VoteController {
             Optional<Vote> existingVote = voteRepository.findById(voteId);
 
             if (existingVote.isPresent()) {
-                // Update existing vote
                 Vote vote = existingVote.get();
                 if (voteType.equals(vote.getVoteType())) {
-                    // Same vote type - remove the vote
                     voteRepository.delete(vote);
                     return ResponseEntity.ok("Vote removed");
                 } else {
-                    // Different vote type - update it
                     vote.setVoteType(voteType);
                     voteRepository.save(vote);
                     return ResponseEntity.ok("Vote updated");
                 }
             } else {
-                // Create new vote
                 Vote newVote = new Vote(userId, spotId);
                 newVote.setVoteType(voteType);
                 voteRepository.save(newVote);
@@ -117,12 +112,10 @@ public class VoteController {
         }
     }
 
-    // Helper classes for request/response
     static class VoteRequest {
         private Integer userId;
         private Integer spotId;
 
-        // Getters and setters
         public Integer getUserId() { return userId; }
         public void setUserId(Integer userId) { this.userId = userId; }
         public Integer getSpotId() { return spotId; }
@@ -138,7 +131,6 @@ public class VoteController {
             this.voteType = voteType;
         }
 
-        // Getters
         public Integer getSpotId() { return spotId; }
         public String getVoteType() { return voteType; }
     }

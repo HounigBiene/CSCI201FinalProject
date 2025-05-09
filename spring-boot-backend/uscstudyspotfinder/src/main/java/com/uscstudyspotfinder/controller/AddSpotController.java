@@ -1,62 +1,46 @@
 package com.uscstudyspotfinder.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-
-import com.uscstudyspotfinder.repository.UserRepository;
 import com.uscstudyspotfinder.repository.StudySpotRepository;
 import com.uscstudyspotfinder.model.StudySpot;
-import com.uscstudyspotfinder.repository.VoteRepository;
-import com.uscstudyspotfinder.model.User;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-import java.util.Optional;
-
-import com.uscstudyspotfinder.model.User;
-import com.uscstudyspotfinder.repository.UserRepository;
-import com.uscstudyspotfinder.dto.LoginRequest;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
+import com.uscstudyspotfinder.dto.AddSpotResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.GeometryFactory;
-
-
 
 @RestController
 @RequestMapping("/api/addspot")
 @CrossOrigin
 public class AddSpotController {
-	@Autowired
+    @Autowired
     private StudySpotRepository spotRepository;
-	
-	@PostMapping()
-    public ResponseEntity<String> addSpot(@RequestBody StudySpot spotrequest)
-    {
-		
-    GeometryFactory geometryFactory = new GeometryFactory();
-    System.out.println(spotrequest.getLongitude());
-    System.out.println(spotrequest.getLatitude());
-    Point location = geometryFactory.createPoint(
-        new Coordinate(spotrequest.getLongitude(), spotrequest.getLatitude())
-    );
+    
+    @PostMapping()
+    public ResponseEntity<AddSpotResponse> addSpot(@RequestBody StudySpot spotrequest) {
+        GeometryFactory geometryFactory = new GeometryFactory();
+        System.out.println(spotrequest.getLongitude());
+        System.out.println(spotrequest.getLatitude());
+        Point location = geometryFactory.createPoint(
+            new Coordinate(spotrequest.getLongitude(), spotrequest.getLatitude())
+        );
 
-    spotrequest.setLocationPin(location);
+        spotrequest.setLocationPin(location);
+        spotrequest.setCurrentCheckInCount(0);
 
-    System.out.println("About to save spot");
-
-		spotRepository.save(spotrequest);
-		
-		return null;
+        System.out.println("About to save spot");
+        StudySpot savedSpot = spotRepository.save(spotrequest);
+        
+        AddSpotResponse response = new AddSpotResponse(
+            savedSpot.getLocationId(),
+            savedSpot.getName(),
+            savedSpot.getDescription(),
+            savedSpot.getLatitude(),
+            savedSpot.getLongitude(),
+            savedSpot.getCurrentCheckInCount()
+        );
+        
+        return ResponseEntity.ok(response);
     }
 }
