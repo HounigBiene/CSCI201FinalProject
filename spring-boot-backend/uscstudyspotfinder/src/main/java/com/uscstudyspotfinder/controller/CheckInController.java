@@ -44,8 +44,7 @@ public class CheckInController {
     }
 
     @PostMapping("/{locationId}/user/{userId}/checkout")
-    public ResponseEntity<?> checkOut(@PathVariable Long locationId, @PathVariable Integer userId) {
-        // TODO: Fix the checkout time handling logic; Ensure that only one active check-in exists for a user per location
+    public ResponseEntity<?> checkOut(@PathVariable Long locationId, @PathVariable Integer userId) {        
         CheckIn checkIn = checkInRepository.findActiveCheckIn(userId, locationId);
         if (checkIn == null) {
             return ResponseEntity.badRequest().body("No active check-in found.");

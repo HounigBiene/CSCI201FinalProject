@@ -98,7 +98,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
   const [userVotes, setUserVotes] = useState({});
   const { isLoggedIn, currentUser } = useAuth();
   const [prevFavorites, setFavoriteSpots] = useState([]);
-  //const [favorites, setFavorites] = useState([]);
+  const [popupData, setPopupData] = useState({});
 
   console.log(currentUser);
   console.log("dbSpots:", dbSpots);
@@ -118,14 +118,45 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        setDbSpots(data);
+
+        // Fetch vote counts and user's vote status for each spot
+        const spotsWithVotes = await Promise.all(data.map(async (spot) => {
+          const upvotesResponse = await fetch(`http://localhost:8080/api/vote/upvotes/${spot.locationId}`);
+          const downvotesResponse = await fetch(`http://localhost:8080/api/vote/downvotes/${spot.locationId}`);
+
+          // Fetch user's vote status if logged in
+          let userVoteType = null;
+          if (isLoggedIn && currentUser) {
+            try {
+              const userVoteResponse = await fetch(`http://localhost:8080/api/vote/user/${currentUser.userId}/spot/${spot.locationId}`);
+              if (userVoteResponse.ok) {
+                const voteData = await userVoteResponse.json();
+                userVoteType = voteData.voteType || null;
+              }
+            } catch (error) {
+              console.error("Error fetching user vote:", error);
+            }
+          }
+
+          const upvotesData = await upvotesResponse.json();
+          const downvotesData = await downvotesResponse.json();
+
+          return {
+            ...spot,
+            upvotes: typeof upvotesData === 'number' ? upvotesData : 0,
+            downvotes: typeof downvotesData === 'number' ? downvotesData : 0,
+            userVoteType: userVoteType
+          };
+        }));
+
+        setDbSpots(spotsWithVotes);
       } catch (error) {
         console.error("Failed to fetch study spots:", error);
       }
     };
 
     fetchStudySpots();
-  }, []); // Empty dependency array ensures this runs only once on mount
+  }, [isLoggedIn, currentUser]); // Add dependencies to refetch when login status changes
   useEffect(() => {
     if (selectedMarkerKey) {
       const spotToEdit = dbSpots.find(s => s.key === selectedMarkerKey);
@@ -246,7 +277,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
                 verticalAlign: "center",
               }}
             >
-              ↑ <span>{marker.upvotes}</span>
+              ↑
             </button>
 
             <button
@@ -265,7 +296,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
                 verticalAlign: "center",
               }}
             >
-              ↓ <span>{marker.downvotes}</span>
+              ↓
             </button>
             <button
               onClick={onDeleteClick}
@@ -510,89 +541,103 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
   };
 
 
-  const upvoteDbSpot = (key) => {
-    if (userVotes[key] === "upvote") {
-      //unvote
-      setDbSpots((prevSpots) =>
-        prevSpots.map((spot) =>
-          spot.key === key
-            ? {
-              ...spot,
-              upvotes: Math.max(0, (spot.upvotes || 0) - 1),
-            }
-            : spot
-        )
-      );
-      setUserVotes((prev) => ({ ...prev, [key]: null }));
-    } else {
-      //if downvoted
-      if (userVotes[key] === "downvote") {
-        // If so, remove the downvote and update the state
-        setDbSpots((prevSpots) =>
-          prevSpots.map((spot) =>
-            spot.key === key
-              ? {
-                ...spot,
-                downvotes: Math.max(0, (spot.downvotes || 0) - 1),
-              }
-              : spot
-          )
-        );
+  const upvoteDbSpot = async (key) => {
+    if (!isLoggedIn || !currentUser) {
+      alert("Please log in to vote");
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8080/api/vote/upvote', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: currentUser.userId,
+          spotId: key
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update vote');
       }
+
+      const [upvotesResponse, downvotesResponse, userVoteResponse] = await Promise.all([
+        fetch(`http://localhost:8080/api/vote/upvotes/${key}`),
+        fetch(`http://localhost:8080/api/vote/downvotes/${key}`),
+        fetch(`http://localhost:8080/api/vote/user/${currentUser.userId}/spot/${key}`)
+      ]);
+
+      const upvotesData = await upvotesResponse.json();
+      const downvotesData = await downvotesResponse.json();
+      const voteData = await userVoteResponse.json();
 
       setDbSpots((prevSpots) =>
         prevSpots.map((spot) =>
-          spot.key === key
+          spot.locationId === key
             ? {
               ...spot,
-              upvotes: (spot.upvotes || 0) + 1
+              upvotes: typeof upvotesData === 'number' ? upvotesData : 0,
+              downvotes: typeof downvotesData === 'number' ? downvotesData : 0,
+              userVoteType: voteData.voteType || null
             }
             : spot
         )
       );
-      setUserVotes((prev) => ({ ...prev, [key]: "upvote" }));
-      // TODO: Connect to database to update upvotes in the backend
+    } catch (error) {
+      console.error("Error updating vote:", error);
+      alert("Failed to update vote. Please try again.");
     }
   };
 
-  const downvoteDbSpot = (key) => {
-    if (userVotes[key] === "downvote") {
+  const downvoteDbSpot = async (key) => {
+    if (!isLoggedIn || !currentUser) {
+      alert("Please log in to vote");
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8080/api/vote/downvote', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          userId: currentUser.userId,
+          spotId: key
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update vote');
+      }
+
+      const [upvotesResponse, downvotesResponse, userVoteResponse] = await Promise.all([
+        fetch(`http://localhost:8080/api/vote/upvotes/${key}`),
+        fetch(`http://localhost:8080/api/vote/downvotes/${key}`),
+        fetch(`http://localhost:8080/api/vote/user/${currentUser.userId}/spot/${key}`)
+      ]);
+
+      const upvotesData = await upvotesResponse.json();
+      const downvotesData = await downvotesResponse.json();
+      const voteData = await userVoteResponse.json();
+
       setDbSpots((prevSpots) =>
         prevSpots.map((spot) =>
-          spot.key === key
+          spot.locationId === key
             ? {
               ...spot,
-              downvotes: Math.max(0, (spot.downvotes || 0) - 1),
+              upvotes: typeof upvotesData === 'number' ? upvotesData : 0,
+              downvotes: typeof downvotesData === 'number' ? downvotesData : 0,
+              userVoteType: voteData.voteType || null
             }
             : spot
         )
       );
-      setUserVotes((prev) => ({ ...prev, [key]: null }));
-    } else {
-      //if upvoted
-      if (userVotes[key] === "upvote") {
-        // If so, remove the downvote and update the state
-        setDbSpots((prevSpots) =>
-          prevSpots.map((spot) =>
-            spot.key === key
-              ? {
-                ...spot,
-                upvotes: Math.max(0, (spot.upvotes || 0) - 1),
-              }
-              : spot
-          )
-        );
-      }
-
-      setDbSpots((prevSpots) =>
-        prevSpots.map((spot) =>
-          spot.key === key
-            ? { ...spot, downvotes: (spot.downvotes || 0) + 1 }
-            : spot
-        )
-      );
-      setUserVotes((prev) => ({ ...prev, [key]: "downvote" }));
-      // TODO: Connect to database to update downvotes in the backend
+    } catch (error) {
+      console.error("Error updating vote:", error);
+      alert("Failed to update vote. Please try again.");
     }
   };
 
@@ -662,6 +707,50 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       console.error('Error during checkout:', error);
     }
   };
+
+  const fetchAllSpotsData = async () => {
+    try {
+      const spotsData = await Promise.all(dbSpots.map(async (spot) => {
+        const [upvotesResponse, downvotesResponse, userVoteResponse, checkInResponse] = await Promise.all([
+          fetch(`http://localhost:8080/api/vote/upvotes/${spot.locationId}`),
+          fetch(`http://localhost:8080/api/vote/downvotes/${spot.locationId}`),
+          fetch(`http://localhost:8080/api/vote/user/${currentUser?.userId}/spot/${spot.locationId}`),
+          fetch(`http://localhost:8080/api/checkin/${spot.locationId}/total`)
+        ]);
+
+        const upvotesData = await upvotesResponse.json();
+        const downvotesData = await downvotesResponse.json();
+        const voteData = await userVoteResponse.json();
+        const checkInData = await checkInResponse.json();
+
+        return {
+          spotId: spot.locationId,
+          data: {
+            upvotes: typeof upvotesData === 'number' ? upvotesData : 0,
+            downvotes: typeof downvotesData === 'number' ? downvotesData : 0,
+            userVoteType: voteData.voteType || null,
+            currentCheckInCount: checkInData || 0
+          }
+        };
+      }));
+
+      const newPopupData = spotsData.reduce((acc, { spotId, data }) => {
+        acc[spotId] = data;
+        return acc;
+      }, {});
+
+      setPopupData(newPopupData);
+    } catch (error) {
+      console.error("Error fetching spots data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchAllSpotsData();
+    const intervalId = setInterval(fetchAllSpotsData, 3000);
+    return () => clearInterval(intervalId);
+  }, [dbSpots, currentUser]);
+
   return (
     <div style={{ position: "relative", width: "100%", height: "100vh" }}>
       {panelOpen && (
@@ -760,8 +849,8 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
             >
               <Popup>
                 <strong style={{ margin: '0 0 5px' }}>{spot.name || "Study Spot"} (
-                  <span style={{ color: spot.currentCheckInCount >= 5 ? 'red' : spot.currentCheckInCount >= 2 ? 'orange' : 'green' }}>
-                    {spot.currentCheckInCount >= 5 ? 'Busy' : spot.currentCheckInCount >= 2 ? 'Moderate' : 'Empty'}
+                  <span style={{ color: (popupData[spot.locationId]?.currentCheckInCount || spot.currentCheckInCount) >= 5 ? 'red' : (popupData[spot.locationId]?.currentCheckInCount || spot.currentCheckInCount) >= 2 ? 'orange' : 'green' }}>
+                    {(popupData[spot.locationId]?.currentCheckInCount || spot.currentCheckInCount) >= 5 ? 'Busy' : (popupData[spot.locationId]?.currentCheckInCount || spot.currentCheckInCount) >= 2 ? 'Moderate' : 'Empty'}
                   </span>
                   )
                   <FavoriteStar markerId={spot.locationId || `spot-${spot.latitude}`} />
@@ -772,16 +861,19 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
                 Coordinates: {spot.latitude.toFixed(5)},{" "}
                 {spot.longitude.toFixed(5)}
                 <p>
-                  Number of Current People: {spot.currentCheckInCount || 0}
+                  Number of Current People: {popupData[spot.locationId]?.currentCheckInCount || spot.currentCheckInCount || 0}
+                </p>
+                <p>
+                  Number of Likes: {popupData[spot.locationId]?.upvotes || spot.upvotes || 0}
                 </p>
                 <div>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      upvoteDbSpot(spot.key);
+                      upvoteDbSpot(spot.locationId);
                     }}
                     style={{
-                      backgroundColor: "#28a745",
+                      backgroundColor: (popupData[spot.locationId]?.userVoteType || spot.userVoteType) === "upvote" ? "#1e7e34" : "#28a745",
                       color: "white",
                       border: "none",
                       padding: "5px 10px",
@@ -789,19 +881,21 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
                       cursor: "pointer",
                       fontSize: "10px",
                       verticalAlign: "center",
-                      margin: "5px"
+                      margin: "5px",
+                      transform: (popupData[spot.locationId]?.userVoteType || spot.userVoteType) === "upvote" ? "scale(0.95)" : "scale(1)",
+                      transition: "all 0.2s ease"
                     }}
                   >
-                    ↑ <span>{spot.upvotes}</span>
+                    ↑
                   </button>
 
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      downvoteDbSpot(spot.key);
+                      downvoteDbSpot(spot.locationId);
                     }}
                     style={{
-                      backgroundColor: "#ffc107",
+                      backgroundColor: (popupData[spot.locationId]?.userVoteType || spot.userVoteType) === "downvote" ? "#d39e00" : "#ffc107",
                       color: "black",
                       border: "none",
                       padding: "5px 10px",
@@ -809,10 +903,12 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
                       cursor: "pointer",
                       fontSize: "10px",
                       verticalAlign: "center",
-                      margin: "5px"
+                      margin: "5px",
+                      transform: (popupData[spot.locationId]?.userVoteType || spot.userVoteType) === "downvote" ? "scale(0.95)" : "scale(1)",
+                      transition: "all 0.2s ease"
                     }}
                   >
-                    ↓ <span>{spot.downvotes}</span>
+                    ↓
                   </button>
                   <button
                     style={{

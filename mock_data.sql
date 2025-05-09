@@ -43,9 +43,9 @@ INSERT INTO `study_spot` (`name`, `description`, `location_pin`) VALUES
 ('Doheny Library', 'Historic library with silent floors', ST_GeomFromText('POINT(-118.2847 34.0215)'));
 
 -- Insert votes
-INSERT INTO `votes` (`user_id`, `location_id`) VALUES
-(1, 1), (1, 3), (2, 2), (3, 1),
-(4, 4), (4, 1), (5, 5), (5, 3), (6, 6), (6, 2);
+INSERT INTO `votes` (`user_id`, `location_id`, `vote_type`) VALUES
+(1, 1, 'upvote'), (1, 3, 'upvote'), (2, 2, 'upvote'), (3, 1, 'upvote'),
+(4, 4, 'upvote'), (4, 1, 'downvote'), (5, 5, 'upvote'), (5, 3, 'downvote'), (6, 6, 'upvote'), (6, 2, 'downvote');
 
 -- Insert favorites
 INSERT INTO `fave_spot` (`user_id`, `location_id`) VALUES

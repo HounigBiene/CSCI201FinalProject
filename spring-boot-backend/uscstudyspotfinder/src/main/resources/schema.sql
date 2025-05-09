@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS `study_spot`(
 CREATE TABLE IF NOT EXISTS `votes` (
     `user_id` INT NOT NULL,
     `location_id` INT NOT NULL,
+    `vote_type` VARCHAR(10) NOT NULL,
     PRIMARY KEY (`user_id`, `location_id`),
     FOREIGN KEY (`user_id`) REFERENCES users(`user_id`),
     FOREIGN KEY (`location_id`) REFERENCES study_spot(`location_id`)

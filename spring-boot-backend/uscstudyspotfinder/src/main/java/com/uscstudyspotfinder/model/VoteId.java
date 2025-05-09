@@ -10,32 +10,32 @@ import java.util.Objects;
 public class VoteId implements Serializable {
 
     @Column(name = "user_id")
-    private Long userId;
+    private Integer userId;
 
     @Column(name = "location_id")
-    private Long spotId;
+    private Integer spotId;
 
     public VoteId() {
     }
 
-    public VoteId(Long userId, Long spotId) {
+    public VoteId(Integer userId, Integer spotId) {
         this.userId = userId;
         this.spotId = spotId;
     }
 
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public Long getSpotId() {
+    public Integer getSpotId() {
         return spotId;
     }
 
-    public void setSpotId(Long spotId) {
+    public void setSpotId(Integer spotId) {
         this.spotId = spotId;
     }
 
