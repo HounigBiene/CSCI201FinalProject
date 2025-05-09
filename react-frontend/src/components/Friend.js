@@ -249,7 +249,7 @@ export const Friend = ({ isOpen, toggleDashboard }) => {
                   id="friend-search"
                   value={(searchTerm)}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search for friends"
+                  placeholder="Enter Friend Email"
               />
                 <span
                     style={{marginLeft: '8px'}}
@@ -258,7 +258,7 @@ export const Friend = ({ isOpen, toggleDashboard }) => {
                       type="submit"
                       className="submit-friend-search"
                   >
-                    search
+                    Invite
                   </button>
               </span></>
             </form>
