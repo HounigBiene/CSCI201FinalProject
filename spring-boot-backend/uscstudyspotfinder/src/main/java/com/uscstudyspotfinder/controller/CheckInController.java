@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/checkin")
 public class CheckInController {
@@ -58,6 +59,12 @@ public class CheckInController {
         studySpotRepository.save(studySpot);
 
         return ResponseEntity.ok("User checked out successfully.");
+    }
+
+    @GetMapping("/{locationId}/user/{userId}")
+    public ResponseEntity<Boolean> getUserCheckInStatus(@PathVariable Long locationId, @PathVariable Integer userId) {
+        CheckIn checkIn = checkInRepository.findActiveCheckIn(userId, locationId);
+        return ResponseEntity.ok(checkIn != null);
     }
 }
 //

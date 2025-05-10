@@ -145,24 +145,33 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
 
       // Fetch detailed data for each spot
       const spotsWithVotes = await Promise.all(spotsData.map(async (spot) => {
-        const [upvotesResponse, downvotesResponse, userVoteResponse, checkInResponse] = await Promise.all([
+        const [upvotesResponse, downvotesResponse, userVoteResponse, checkInResponse, userCheckInResponse] = await Promise.all([
           fetch(`http://localhost:8080/api/vote/upvotes/${spot.locationId}`),
           fetch(`http://localhost:8080/api/vote/downvotes/${spot.locationId}`),
           fetch(`http://localhost:8080/api/vote/user/${currentUser?.userId}/spot/${spot.locationId}`),
-          fetch(`http://localhost:8080/api/checkin/${spot.locationId}/total`)
+          fetch(`http://localhost:8080/api/checkin/${spot.locationId}/total`),
+          isLoggedIn && currentUser ? fetch(`http://localhost:8080/api/checkin/${spot.locationId}/user/${currentUser.userId}`) : Promise.resolve({ ok: false })
         ]);
 
         const upvotesData = await upvotesResponse.json();
         const downvotesData = await downvotesResponse.json();
         const voteData = await userVoteResponse.json();
         const checkInData = await checkInResponse.json();
+        const userCheckInData = userCheckInResponse.ok ? await userCheckInResponse.json() : false;
+
+        console.log(`Spot ${spot.locationId} check-in data:`, {
+          userCheckInResponse: userCheckInResponse.ok,
+          userCheckInData,
+          spotName: spot.name
+        });
 
         return {
           ...spot,
           upvotes: typeof upvotesData === 'number' ? upvotesData : 0,
           downvotes: typeof downvotesData === 'number' ? downvotesData : 0,
           userVoteType: voteData.voteType || null,
-          currentCheckInCount: checkInData || 0
+          currentCheckInCount: checkInData || 0,
+          checkedIn: userCheckInData
         };
       }));
 
@@ -174,11 +183,13 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
           upvotes: spot.upvotes,
           downvotes: spot.downvotes,
           userVoteType: spot.userVoteType,
-          currentCheckInCount: spot.currentCheckInCount
+          currentCheckInCount: spot.currentCheckInCount,
+          checkedIn: spot.checkedIn
         };
         return acc;
       }, {});
 
+      console.log('Updated dbSpotsData:', newDbSpotsData);
       setDbSpotsData(newDbSpotsData);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -726,13 +737,15 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
       return;
     }
     try {
-      const response = await fetch(`/api/checkin/${locationId}/user/${userId}`, {
+      const response = await fetch(`http://localhost:8080/api/checkin/${locationId}/user/${userId}`, {
         method: 'POST',
       });
 
       if (!response.ok) {
         throw new Error('Check-in failed');
       }
+
+      console.log('Check-in successful for spot:', locationId);
 
       // Toggle check-in status for the marker
       setDbSpots((prevSpots) =>
@@ -746,6 +759,16 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
             : spot
         )
       );
+
+      // Also update dbSpotsData
+      setDbSpotsData(prevData => ({
+        ...prevData,
+        [locationId]: {
+          ...prevData[locationId],
+          checkedIn: true,
+          currentCheckInCount: (prevData[locationId]?.currentCheckInCount || 0) + 1
+        }
+      }));
     } catch (error) {
       console.error('Error during check-in:', error);
     }
@@ -760,13 +783,15 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     }
 
     try {
-      const response = await fetch(`/api/checkin/${locationId}/user/${userId}/checkout`, {
+      const response = await fetch(`http://localhost:8080/api/checkin/${locationId}/user/${userId}/checkout`, {
         method: 'POST',
       });
 
       if (!response.ok) {
         throw new Error('Checkout failed');
       }
+
+      console.log('Check-out successful for spot:', locationId);
 
       // Toggle check-out status for the marker
       setDbSpots((prevSpots) =>
@@ -780,6 +805,16 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
             : spot
         )
       );
+
+      // Also update dbSpotsData
+      setDbSpotsData(prevData => ({
+        ...prevData,
+        [locationId]: {
+          ...prevData[locationId],
+          checkedIn: false,
+          currentCheckInCount: Math.max(0, (prevData[locationId]?.currentCheckInCount || 0) - 1)
+        }
+      }));
     } catch (error) {
       console.error('Error during checkout:', error);
     }
@@ -956,9 +991,9 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
                           cursor: "pointer",
                           margin: "5px"
                         }}
-                        onClick={() => spot.checkedIn ? toggleDbSpotCheckOut(spot.locationId) : toggleDbSpotCheckIn(spot.locationId)}
+                        onClick={() => (dbSpotsData[spot.locationId]?.checkedIn || spot.checkedIn) ? toggleDbSpotCheckOut(spot.locationId) : toggleDbSpotCheckIn(spot.locationId)}
                       >
-                        {spot.checkedIn ? "Check Out" : "Check In"}
+                        {(dbSpotsData[spot.locationId]?.checkedIn || spot.checkedIn) ? "Check Out" : "Check In"}
                       </button>
                     </>
                   ) : (
