@@ -506,12 +506,9 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
     if (!spotName.trim()) {
       return alert("Please enter a name for the spot.");
     }
-    if (selectedMarkerKey) {
-      await updateMarker(selectedMarkerKey, spotName, description);
-    } else if (clickPosition) {
+    if (clickPosition) {
       await addMarker(clickPosition, spotName, description);
     }
-    setSelectedMarkerKey(null);
     setClickPosition(null);
     setDescription("");
     setSpotName("");
@@ -519,9 +516,9 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
   };
 
   const handleCancel = () => {
-    setSelectedMarkerKey(null);
     setClickPosition(null);
     setDescription("");
+    setSpotName("");
     setPanelOpen(false);
   };
 
@@ -839,7 +836,7 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
           }}
         >
           <div style={{ pointerEvents: "auto" }}>
-            <h3>{selectedMarkerKey ? "Edit Marker" : "Add New Marker"}</h3>
+            <h3>Add New Marker</h3>
             <input
               type="text"
               placeholder="Spot Name"
@@ -1003,27 +1000,6 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
                   )}
                   {isLoggedIn && (
                     <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedMarkerKey(spot.locationId);
-                          setDescription(spot.description || "");
-                          setSpotName(spot.name || "");
-                          setPanelOpen(true);
-                          setClickPosition(null);
-                        }}
-                        style={{
-                          backgroundColor: "#6c757d",
-                          color: "white",
-                          border: "none",
-                          padding: "5px 10px",
-                          borderRadius: "4px",
-                          cursor: "pointer",
-                          margin: "5px"
-                        }}
-                      >
-                        Edit
-                      </button>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
