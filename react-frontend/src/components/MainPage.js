@@ -40,12 +40,14 @@ function MapClickHandler({
   setDescription,
   setSpotName,
   setPanelOpen,
+  isLoggedIn
 }) {
   useMapEvents({
     click: (e) => {
       if (
         !e.originalEvent.target.closest(".leaflet-popup") &&
-        !e.originalEvent.target.closest(".leaflet-marker-icon")
+        !e.originalEvent.target.closest(".leaflet-marker-icon") &&
+        isLoggedIn
       ) {
         setClickPosition([e.latlng.lat, e.latlng.lng]);
         setSelectedMarkerKey(null);
@@ -898,10 +900,11 @@ const MainPage = ({ friendOpen, toggleFriend, userId }) => {
             setDescription={setDescription}
             setSpotName={setSpotName}
             setPanelOpen={setPanelOpen}
+            isLoggedIn={isLoggedIn}
           />
           <LocationMarker setCenter={setCenter} />
 
-          {clickPosition && !selectedMarkerKey && (
+          {isLoggedIn && clickPosition && !selectedMarkerKey && (
             <Marker position={clickPosition} icon={redIcon}>
               <Popup>New Spot Location</Popup>
             </Marker>
